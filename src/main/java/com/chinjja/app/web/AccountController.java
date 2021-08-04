@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
+import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
+import com.chinjja.app.account.dto.AddressCreateDto;
 import com.chinjja.app.account.service.AccountService;
 
 import lombok.RequiredArgsConstructor;
@@ -54,5 +56,18 @@ public class AccountController {
 	@GetMapping("/{id}/roles")
 	public Iterable<String> getRoles(@PathVariable("id") Account account) {
 		return accountService.getRoles(account);
+	}
+	
+	@PostMapping("/{id}/addresses")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Address createAddress(
+			@PathVariable("id") Account account,
+			@RequestBody AddressCreateDto dto) {
+		return accountService.addAddress(account, dto);
+	}
+	
+	@GetMapping("/{id}/addresses")
+	public Iterable<Address> getAddresses(@PathVariable("id") Account account) {
+		return accountService.getAddresses(account);
 	}
 }

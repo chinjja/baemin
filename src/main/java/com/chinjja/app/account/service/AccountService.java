@@ -16,9 +16,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
+import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
+import com.chinjja.app.account.dto.AddressCreateDto;
 import com.chinjja.app.account.repo.AccountRepository;
 import com.chinjja.app.account.repo.AccountRoleRepository;
+import com.chinjja.app.account.repo.AddressRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -30,6 +33,7 @@ import lombok.val;
 public class AccountService {
 	private final AccountRepository accountRepository;
 	private final AccountRoleRepository accountRoleRepository;
+	private final AddressRepository addressRepository;
 	private final PasswordEncoder passwordEncoder;
 	
 	private final ModelMapper mapper = new ModelMapper() {{
@@ -84,5 +88,39 @@ public class AccountService {
 		return StreamSupport.stream(accountRoleRepository.findAllByAccount(account).spliterator(), false)
 				.map(x -> x.getRole())
 				.collect(Collectors.toList());
+	}
+	
+	@Transactional
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
+	public Address addAddress(Account account, AddressCreateDto dto) {
+		val addr = mapper.map(dto, Address.class);
+		addr.setAccount(account);
+		return addressRepository.save(addr);
+	}
+
+	@Transactional
+	@PreAuthorize("isAuthenticated() and #address.account.email == principal.username")
+	public void deleteAddress(Address address) {
+		if(address.isMaster()) {
+			throw new IllegalArgumentException("cannot delete primary address");
+		}
+		addressRepository.delete(address);
+	}
+	
+	public Iterable<Address> getAddresses(Account account) {
+		return addressRepository.findAllByAccount(account);
+	}
+	
+	@Transactional
+	@PreAuthorize("isAuthenticated() and #address.account.email == principal.username")
+	public Address setPrimary(Address address) {
+		addressRepository.findByAccountAndMasterIsTrue(address.getAccount())
+		.ifPresent(x -> {
+			x.setMaster(false);
+			addressRepository.save(x);
+		});
+		
+		address.setMaster(true);
+		return addressRepository.save(address);
 	}
 }
