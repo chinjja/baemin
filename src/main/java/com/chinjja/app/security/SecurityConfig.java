@@ -25,7 +25,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		.and()
 		.httpBasic()
 		.and()
-		.formLogin();
+		.formLogin()
+		.and()
+		.csrf().ignoringAntMatchers("/api/**");
 	}
 	
 	@Bean
