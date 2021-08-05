@@ -16,6 +16,9 @@ import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
 import com.chinjja.app.account.dto.AddressCreateDto;
 import com.chinjja.app.account.service.AccountService;
+import com.chinjja.app.domain.Product;
+import com.chinjja.app.dto.ProductCreateDto;
+import com.chinjja.app.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/accounts")
 public class AccountController {
 	private final AccountService accountService;
+	private final ProductService productService;
 	
 	@GetMapping("/{id}")
 	public Account one(@PathVariable("id") Account account) {
@@ -69,5 +73,19 @@ public class AccountController {
 	@GetMapping("/{id}/addresses")
 	public Iterable<Address> getAddresses(@PathVariable("id") Account account) {
 		return accountService.getAddresses(account);
+	}
+	
+	@PostMapping("/{id}/products")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Product createProduct(
+			@PathVariable("id") Account account,
+			@RequestBody ProductCreateDto dto) {
+		return productService.create(account, dto);
+	}
+	
+	@GetMapping("/{id}/products")
+	public Iterable<Product> getProducts(
+			@PathVariable("id") Account account) {
+		return productService.findBySeller(account);
 	}
 }

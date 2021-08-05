@@ -7,6 +7,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
+
 import static com.chinjja.app.util.TestUtils.*;
 
 import org.junit.jupiter.api.Test;
@@ -21,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.chinjja.app.account.dto.AccountCreateDto;
 import com.chinjja.app.account.dto.AddressCreateDto;
+import com.chinjja.app.domain.Product;
+import com.chinjja.app.dto.ProductCreateDto;
 
 import lombok.val;
 
@@ -124,6 +128,52 @@ public class AccountTests {
 		assertThat(addresses(account)).isEmpty();
 	}
 	
+	@Test
+	void givenUnauthorized_whenCreateProduct_thenShouldReturn401() throws Exception {
+		val account = account(1);
+		
+		val dto = ProductCreateDto.builder()
+				.code("FOOD")
+				.title("food")
+				.description("this is food")
+				.price(new BigDecimal("1000"))
+				.build();
+		
+		mvc.perform(post("/api/accounts/{id}/products", account.getId())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(toBytes(dto)))
+				.andExpect(status().isUnauthorized());
+	}
+	
+	@Test
+	@WithMockUser("root@user.com")
+	void givenAuthorized_whenCreateProduct_thenShouldCreateNewProduct() throws Exception {
+		val account = account(1);
+		
+		val dto = ProductCreateDto.builder()
+				.code("FOOD")
+				.title("food")
+				.description("this is food")
+				.price(new BigDecimal("1000"))
+				.build();
+		
+		val product = to(mvc.perform(post("/api/accounts/{id}/products", account.getId())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(toBytes(dto)))
+				.andExpect(status().isCreated())
+				.andReturn(), Product.class);
+		
+		assertEquals("FOOD", product.getCode());
+		assertEquals("food", product.getTitle());
+		assertEquals("this is food", product.getDescription());
+		assertEquals(new BigDecimal("1000"), product.getPrice());
+		assertEquals(account, product.getSeller());
+		
+		assertThat(products(account)).hasSize(1).contains(product);
+	}
+	
 	Account account(long id) throws Exception {
 		return to(mvc.perform(get("/api/accounts/{id}", id)
 				.accept(MediaType.APPLICATION_JSON))
@@ -136,5 +186,12 @@ public class AccountTests {
 						.accept(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn(), Address[].class);
+	}
+	
+	Product[] products(Account account) throws Exception {
+		return to(mvc.perform(get("/api/accounts/{id}/products", account.getId())
+						.accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn(), Product[].class);
 	}
 }
