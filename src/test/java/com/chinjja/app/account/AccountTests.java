@@ -17,6 +17,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.chinjja.app.account.dto.AccountCreateDto;
+
 import lombok.val;
 
 @SpringBootTest
@@ -68,4 +70,28 @@ public class AccountTests {
 		assertThat(roles).contains("MANAGER");
 	}
 	
+	@Test
+	void create() throws Exception {
+		val dto = AccountCreateDto.builder()
+				.email("user@user.com")
+				.password("12345678")
+				.name("user")
+				.build();
+		val account = to(mvc.perform(post("/api/accounts")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toBytes(dto)))
+				.andExpect(status().isCreated())
+				.andReturn(), Account.class);
+		
+		assertThat(account.getEmail()).isEqualTo("user@user.com");
+		assertThat(account.getPassword()).isNull();
+		assertThat(account.getName()).isEqualTo("user");
+		
+		mvc.perform(post("/api/accounts")
+				.accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(toBytes(dto)))
+				.andExpect(status().isConflict());
+	}
 }

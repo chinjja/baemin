@@ -13,4 +13,8 @@ public class TestUtils {
 		val res = result.getResponse();
 		return mapper.readValue(res.getContentAsByteArray(), cls);
 	}
+	
+	public static byte[] toBytes(Object obj) throws Exception {
+		return mapper.writeValueAsBytes(obj);
+	}
 }

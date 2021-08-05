@@ -6,11 +6,13 @@ import java.util.stream.StreamSupport;
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
@@ -54,6 +56,9 @@ public class AccountService {
 	@Transactional
 	@PreAuthorize("permitAll")
 	public Account create(@Valid AccountCreateDto dto) {
+		if(accountRepository.findByEmail(dto.getEmail()).isPresent()) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT);
+		}
 		val account = accountRepository.save(mapper.map(dto, Account.class));
 		account.setPassword(passwordEncoder.encode(dto.getPassword()));
 		addRole(account, "USER");
