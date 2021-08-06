@@ -82,14 +82,6 @@ public class BaeminLogicTests {
 			assertThat(orange.getDescription()).isEqualTo("this is orange");
 			assertThat(orange.getPrice()).isEqualTo(new BigDecimal("1000"));
 			assertThat(orange.getQuantity()).isEqualTo(100);
-			
-			val orange2 = Bridge.plus_quantity(mvc, orange, -100);
-			assertThat(orange2.getQuantity()).isEqualTo(0);
-			
-			val ex = assertThrows(ResponseStatusException.class, () -> {
-				Bridge.plus_quantity(mvc, orange, -1);
-			});
-			assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
 		}
 		
 		@Test
@@ -131,6 +123,39 @@ public class BaeminLogicTests {
 						.price(new BigDecimal("500"))
 						.quantity(10)
 						.build());
+			}
+			
+			@Test
+			@WithSeller
+			void shouldBeChangedToZero() throws Exception {
+				val orange2 = Bridge.plus_quantity(mvc, orange, -100);
+				assertThat(orange2.getQuantity()).isEqualTo(0);
+			}
+			
+			@Test
+			@WithSeller
+			void whenChangedToNegative_thenShouldReturn400() throws Exception {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
+					Bridge.plus_quantity(mvc, orange, -101);
+				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+			}
+			
+			@Test
+			void whenChangeQuantity_thenShouldReturn401() throws Exception {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
+					shouldBeChangedToZero();
+				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+			}
+			
+			@Test
+			@WithBuyer
+			void whenChangeQuantity_thenShouldReturn403() throws Exception {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
+					shouldBeChangedToZero();
+				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
 			}
 			
 			@Test
