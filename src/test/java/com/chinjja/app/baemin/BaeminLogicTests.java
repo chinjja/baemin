@@ -218,6 +218,20 @@ public class BaeminLogicTests {
 
 						val banana2 = Bridge.product(mvc, banana.getId());
 						assertThat(banana2.getQuantity()).isEqualTo(10);
+						
+						assertThrows(Exception.class, () -> {
+							Bridge.buy(mvc, buyer);
+						});
+					}
+					
+					@Test
+					@WithBuyer
+					void buyAfterCancel() throws Exception {
+						Bridge.cancel(mvc, order);
+						
+						assertThrows(Exception.class, () -> {
+							Bridge.buy(mvc, buyer);
+						});
 					}
 					
 					@Test
@@ -230,6 +244,20 @@ public class BaeminLogicTests {
 
 						val banana2 = Bridge.product(mvc, banana.getId());
 						assertThat(banana2.getQuantity()).isEqualTo(0);
+						
+						assertThrows(Exception.class, () -> {
+							Bridge.buy(mvc, buyer);
+						});
+					}
+					
+					@Test
+					@WithBuyer
+					void buyAfterComplete() throws Exception {
+						Bridge.complete(mvc, order);
+						
+						assertThrows(Exception.class, () -> {
+							Bridge.buy(mvc, buyer);
+						});
 					}
 				}
 			}
