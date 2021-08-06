@@ -39,7 +39,7 @@ public class Bridge {
 				.andReturn(), Product[].class);
 	}
 	
-	public static Product product_plus_quantity(MockMvc mvc, Product product, int quantity) throws Exception {
+	public static Product plus_quantity(MockMvc mvc, Product product, int quantity) throws Exception {
 		return to(mvc.perform(patch("/api/products/{id}/quantity", product.getId())
 						.param("quantity", String.valueOf(quantity))
 						.accept(MediaType.APPLICATION_JSON))

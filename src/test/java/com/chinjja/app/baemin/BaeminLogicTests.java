@@ -82,11 +82,11 @@ public class BaeminLogicTests {
 			assertThat(orange.getPrice()).isEqualTo(new BigDecimal("1000"));
 			assertThat(orange.getQuantity()).isEqualTo(100);
 			
-			val orange2 = Bridge.product_plus_quantity(mvc, orange, -100);
+			val orange2 = Bridge.plus_quantity(mvc, orange, -100);
 			assertThat(orange2.getQuantity()).isEqualTo(0);
 			
 			val ex = assertThrows(ResponseStatusException.class, () -> {
-				Bridge.product_plus_quantity(mvc, orange, -1);
+				Bridge.plus_quantity(mvc, orange, -1);
 			});
 			assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
 		}
