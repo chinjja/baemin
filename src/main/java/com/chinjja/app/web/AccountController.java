@@ -114,7 +114,7 @@ public class AccountController {
 		return baeminService.findOrders(account, status);
 	}
 	
-	@GetMapping("/{id}/carts")
+	@GetMapping("/{id}/cart")
 	public Cart getCart(@PathVariable("id") Account account) {
 		return baeminService.findCart(account);
 	}

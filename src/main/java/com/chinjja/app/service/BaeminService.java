@@ -119,7 +119,8 @@ public class BaeminService {
 	}
 	
 	public Cart findCart(Account account) {
-		return cartRepository.findByAccountAndOrderIsNull(account).orElse(null);
+		return cartRepository.findByAccountAndOrderIsNull(account)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 	
 	public Iterable<Order> findOrders(Account account, Status status) {
@@ -152,7 +153,7 @@ public class BaeminService {
 	@Transactional
 	public Order buy(Account account) {
 		val cart = cartRepository.findByAccountAndOrderIsNull(account)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not exists cart"));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "not exists cart"));
 		return buy(cart);
 	}
 	

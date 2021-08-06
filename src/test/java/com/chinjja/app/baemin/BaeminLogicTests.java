@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.dto.AccountCreateDto;
 import com.chinjja.app.account.service.AccountService;
+import com.chinjja.app.domain.CartProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
@@ -138,44 +139,51 @@ public class BaeminLogicTests {
 				val cartProduct = Bridge.add_to_cart(mvc, buyer, orange, 10);
 				assertThat(cartProduct.getQuantity()).isEqualTo(10);
 				assertThat(cartProduct.getProduct()).isEqualTo(orange);
-				
-				val cartProduct2 = Bridge.plus_quantity(mvc, cartProduct, 5);
-				assertThat(cartProduct2.getQuantity()).isEqualTo(15);
-				
-				val orange2 = Bridge.product(mvc, orange.getId());
-				assertThat(orange2.getQuantity()).isEqualTo(100);
 			}
 			
 			@Test
 			void addToCartWithoutUser() throws Exception {
-				assertThrows(Exception.class, () -> {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
 					addToCart();
 				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
 			}
 			
 			@Test
 			@WithSeller
 			void addToCartWithSeller() throws Exception {
-				assertThrows(Exception.class, () -> {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
 					addToCart();
 				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
 			}
 			
 			@Test
 			@WithBuyer
-			void buyWhenNotExistsCart() throws Exception {
+			void whenBuy_thenShouldReturn400() throws Exception {
 				val ex = assertThrows(ResponseStatusException.class, () -> {
 					Bridge.buy(mvc, buyer);
+				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+			}
+			
+			@Test
+			void whenTakeCart_thenShouldReturn404() throws Exception {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
+					Bridge.cart(mvc, buyer);
 				});
 				assertThat(ex.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
 			}
 			
 			@Nested
 			class AddToCart {
+				CartProduct orangeInCart;
+				CartProduct bananaInCart;
+				
 				@BeforeEach
 				void setup() {
-					baeminService.addToCart(buyer, orange, 10);
-					baeminService.addToCart(buyer, banana, 10);
+					orangeInCart = baeminService.addToCart(buyer, orange, 10);
+					bananaInCart = baeminService.addToCart(buyer, banana, 10);
 				}
 				
 				@Test
@@ -183,19 +191,23 @@ public class BaeminLogicTests {
 				void buy() throws Exception {
 					val order = Bridge.buy(mvc, buyer);
 					assertThat(order.getStatus()).isEqualTo(Status.IN_PROGRESS);
-					
-					val orange2 = Bridge.product(mvc, orange.getId());
-					assertThat(orange2.getQuantity()).isEqualTo(90);
-
-					val banana2 = Bridge.product(mvc, banana.getId());
-					assertThat(banana2.getQuantity()).isEqualTo(0);
 				}
 				
 				@Test
-				void buyWithoutUser() throws Exception {
-					assertThrows(Exception.class, () -> {
+				@WithSeller
+				void whenBuy_thenShouldThrow403() throws Exception {
+					val ex = assertThrows(ResponseStatusException.class, () -> {
 						Bridge.buy(mvc, buyer);
 					});
+					assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
+				}
+				
+				@Test
+				void whenBuy_thenShouldThrow401() throws Exception {
+					val ex = assertThrows(ResponseStatusException.class, () -> {
+						Bridge.buy(mvc, buyer);
+					});
+					assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
 				}
 				
 				@Test
@@ -203,6 +215,46 @@ public class BaeminLogicTests {
 				void addToCart() throws Exception {
 					val orangeInCart = Bridge.add_to_cart(mvc, buyer, orange, 5);
 					assertThat(orangeInCart.getQuantity()).isEqualTo(15);
+				}
+				
+				@Test
+				void shouldReturnCart() throws Exception {
+					val cart = Bridge.cart(mvc, buyer);
+					assertThat(cart.getOrder()).isNull();
+					assertThat(cart.getAccount()).isEqualTo(buyer);
+				}
+				
+				@Test
+				@WithBuyer
+				void testPlusQuantity() throws Exception {
+					val cartProduct2 = Bridge.plus_quantity(mvc, orangeInCart, 5);
+					assertThat(cartProduct2.getQuantity()).isEqualTo(15);
+				}
+				
+				@Test
+				@WithSeller
+				void shouldThrow403() throws Exception {
+					val ex = assertThrows(ResponseStatusException.class, () -> {
+						testPlusQuantity();
+					});
+					assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
+				}
+				
+				@Test
+				void shouldThrow401() throws Exception {
+					val ex = assertThrows(ResponseStatusException.class, () -> {
+						testPlusQuantity();
+					});
+					assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+				}
+				
+				@Test
+				void shouldKeepQuantity() throws Exception {
+					val orange2 = Bridge.product(mvc, orange.getId());
+					assertThat(orange2.getQuantity()).isEqualTo(100);
+					
+					val banana2 = Bridge.product(mvc, banana.getId());
+					assertThat(banana2.getQuantity()).isEqualTo(10);
 				}
 				
 				@Nested
@@ -215,56 +267,103 @@ public class BaeminLogicTests {
 					}
 					
 					@Test
-					@WithBuyer
-					void cancel() throws Exception {
-						val order1 = Bridge.cancel(mvc, order);
-						assertThat(order1.getStatus()).isEqualTo(Status.CANCELLED);
-						
+					void shouldConsumeProductQuantity() throws Exception {
 						val orange2 = Bridge.product(mvc, orange.getId());
-						assertThat(orange2.getQuantity()).isEqualTo(100);
+						assertThat(orange2.getQuantity()).isEqualTo(90);
 
 						val banana2 = Bridge.product(mvc, banana.getId());
-						assertThat(banana2.getQuantity()).isEqualTo(10);
-						
-						assertThrows(Exception.class, () -> {
-							Bridge.buy(mvc, buyer);
-						});
+						assertThat(banana2.getQuantity()).isEqualTo(0);
 					}
 					
 					@Test
 					@WithBuyer
-					void buyAfterCancel() throws Exception {
-						Bridge.cancel(mvc, order);
+					void cancel() throws Exception {
+						val order1 = Bridge.cancel(mvc, order);
+						assertThat(order1.getStatus()).isEqualTo(Status.CANCELLED);
+					}
+					
+					@Test
+					void whenTakeOrder_thenShouldReturnOrder() throws Exception {
+						val orders = Bridge.orders(mvc, buyer, Status.IN_PROGRESS);
+						assertThat(orders).hasSize(1).contains(orders);
+					}
+					
+					@Nested
+					class Cancel {
+						Order cancelled;
 						
-						assertThrows(Exception.class, () -> {
-							Bridge.buy(mvc, buyer);
-						});
+						@BeforeEach
+						void setup() {
+							cancelled = baeminService.cancel(order);
+						}
+						
+						@Test
+						void productStatusShouldBeRestored() throws Exception {
+							val orange2 = Bridge.product(mvc, orange.getId());
+							assertThat(orange2.getQuantity()).isEqualTo(100);
+
+							val banana2 = Bridge.product(mvc, banana.getId());
+							assertThat(banana2.getQuantity()).isEqualTo(10);
+						}
+						
+						@Test
+						@WithBuyer
+						void whenBuy_thenShouldReturn400() throws Exception {
+							val ex = assertThrows(ResponseStatusException.class, () -> {
+								Bridge.buy(mvc, buyer);
+							});
+							assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+						}
+						
+						@Test
+						void whenTakeCart_thenShouldReturn404() throws Exception {
+							val ex = assertThrows(ResponseStatusException.class, () -> {
+								Bridge.cart(mvc, buyer);
+							});
+							assertThat(ex.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+						}
 					}
 					
 					@Test
 					void complete() throws Exception {
 						val order1 = Bridge.complete(mvc, order);
 						assertThat(order1.getStatus()).isEqualTo(Status.COMPLETED);
-						
-						val orange2 = Bridge.product(mvc, orange.getId());
-						assertThat(orange2.getQuantity()).isEqualTo(90);
-
-						val banana2 = Bridge.product(mvc, banana.getId());
-						assertThat(banana2.getQuantity()).isEqualTo(0);
-						
-						assertThrows(Exception.class, () -> {
-							Bridge.buy(mvc, buyer);
-						});
 					}
 					
-					@Test
-					@WithBuyer
-					void buyAfterComplete() throws Exception {
-						Bridge.complete(mvc, order);
+					@Nested
+					class Complete {
+						Order completed;
 						
-						assertThrows(Exception.class, () -> {
-							Bridge.buy(mvc, buyer);
-						});
+						@BeforeEach
+						void setup() {
+							completed = baeminService.complete(order);
+						}
+						
+						@Test
+						void productStatusShouldBeRetained() throws Exception {
+							val orange2 = Bridge.product(mvc, orange.getId());
+							assertThat(orange2.getQuantity()).isEqualTo(90);
+
+							val banana2 = Bridge.product(mvc, banana.getId());
+							assertThat(banana2.getQuantity()).isEqualTo(0);
+						}
+						
+						@Test
+						@WithBuyer
+						void whenBuy_thenShouldReturn400() throws Exception {
+							val ex = assertThrows(ResponseStatusException.class, () -> {
+								Bridge.buy(mvc, buyer);
+							});
+							assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+						}
+						
+						@Test
+						void whenTakeCart_thenShouldReturn404() throws Exception {
+							val ex = assertThrows(ResponseStatusException.class, () -> {
+								Bridge.cart(mvc, buyer);
+							});
+							assertThat(ex.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+						}
 					}
 				}
 			}

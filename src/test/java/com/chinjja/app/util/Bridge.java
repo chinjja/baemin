@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
+import com.chinjja.app.domain.Cart;
 import com.chinjja.app.domain.CartProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
@@ -103,5 +104,11 @@ public class Bridge {
 		return to(mvc.perform(patch("/api/orders/{id}/complete", order.getId())
 						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Order.class);
+	}
+	
+	public static Cart cart(MockMvc mvc, Account account) throws Exception {
+		return to(mvc.perform(get("/api/accounts/{id}/cart", account.getId())
+						.accept(MediaType.APPLICATION_JSON))
+				.andReturn(), Cart.class);
 	}
 }
