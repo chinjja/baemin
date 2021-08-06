@@ -135,7 +135,7 @@ public class BaeminLogicTests {
 			@Test
 			@WithBuyer
 			void addToCart() throws Exception {
-				val cartProduct = Bridge.addToCart(mvc, buyer, orange, 10);
+				val cartProduct = Bridge.add_to_cart(mvc, buyer, orange, 10);
 				assertThat(cartProduct.getQuantity()).isEqualTo(10);
 				assertThat(cartProduct.getProduct()).isEqualTo(orange);
 				

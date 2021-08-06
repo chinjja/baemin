@@ -66,7 +66,7 @@ public class Bridge {
 				.andReturn(), Address[].class);
 	}
 	
-	public static CartProduct addToCart(MockMvc mvc, Account account, Product product, int quantity) throws Exception {
+	public static CartProduct add_to_cart(MockMvc mvc, Account account, Product product, int quantity) throws Exception {
 		return to(mvc.perform(put("/api/accounts/{id}/products/{product_id}", account.getId(), product.getId())
 						.param("quantity", ""+quantity)
 						.accept(MediaType.APPLICATION_JSON))
