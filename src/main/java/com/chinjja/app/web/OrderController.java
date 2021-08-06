@@ -1,5 +1,6 @@
 package com.chinjja.app.web;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ public class OrderController {
 	private final BaeminService baeminService;
 	
 	@PatchMapping("/{id}/cancel")
+	@PreAuthorize("isAuthenticated() and #order.account.email == principal.username")
 	public Order cancel(@PathVariable("id") Order order) {
 		return baeminService.cancel(order);
 	}

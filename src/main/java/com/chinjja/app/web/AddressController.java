@@ -1,6 +1,7 @@
 package com.chinjja.app.web;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ public class AddressController {
 	
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("isAuthenticated() and #address.account.email == principal.username")
 	public void deleteAddress(
 			@PathVariable("id") Address address) {
 		accountService.deleteAddress(address);

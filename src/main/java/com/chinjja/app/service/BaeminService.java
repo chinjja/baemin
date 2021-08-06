@@ -1,10 +1,8 @@
 package com.chinjja.app.service;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +37,6 @@ public class BaeminService {
 	}};
 	
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #seller.email == principal.username")
 	public Product createProduct(Account seller, ProductCreateDto dto) {
 		val product = mapper.map(dto, Product.class);
 		product.setSeller(seller);
@@ -75,7 +72,6 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #cart.account.email == principal.username")
 	public CartProduct addToCart(Cart cart, Product product, int quantity) {
 		val cartProduct = cartProductRepository.findByCartAndProduct(cart, product)
 				.orElseGet(() -> CartProduct.builder()
@@ -92,7 +88,6 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public CartProduct addToCart(Account account, Product product, int quantity) {
 		val cart = cartRepository.findByAccountAndOrderIsNull(account)
 				.orElseGet(() -> cartRepository.save(Cart.builder()
@@ -115,7 +110,6 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #cart.account.email == principal.username")
 	public Order buy(Cart cart) {
 		if(cart.getOrder() != null) {
 			throw new IllegalArgumentException("already bought");
@@ -134,7 +128,6 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Order buy(Account account) {
 		val cart = cartRepository.findByAccountAndOrderIsNull(account)
 				.orElseThrow(() -> new IllegalArgumentException("no cart"));
@@ -142,7 +135,6 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #order.account.email == principal.username")
 	public Order cancel(Order order) {
 		val cart = cartRepository.findByOrder(order).get();
 		for(val i : cartProductRepository.findAllByCart(cart)) {

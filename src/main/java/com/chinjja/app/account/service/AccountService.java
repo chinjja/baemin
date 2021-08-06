@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +57,6 @@ public class AccountService {
 	}
 	
 	@Transactional
-	@PreAuthorize("permitAll")
 	public Account create(@Valid AccountCreateDto dto) {
 		if(accountRepository.findByEmail(dto.getEmail()).isPresent()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -70,7 +68,6 @@ public class AccountService {
 	}
 	
 	@Transactional
-	@PreAuthorize("hasRole('ADMIN')")
 	public AccountRole addRole(Account account, String role) {
 		return accountRoleRepository.save(AccountRole.builder()
 				.account(account)
@@ -79,7 +76,6 @@ public class AccountService {
 	}
 	
 	@Transactional
-	@PreAuthorize("hasRole('ADMIN')")
 	public void deleteRole(Account account, String role) {
 		accountRoleRepository.deleteByAccountAndRole(account, role);
 	}
@@ -91,7 +87,6 @@ public class AccountService {
 	}
 	
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Address addAddress(Account account, AddressCreateDto dto) {
 		val addr = mapper.map(dto, Address.class);
 		addr.setAccount(account);
@@ -99,7 +94,6 @@ public class AccountService {
 	}
 
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #address.account.email == principal.username")
 	public void deleteAddress(Address address) {
 		if(address.isMaster()) {
 			throw new IllegalArgumentException("cannot delete primary address");
@@ -112,7 +106,6 @@ public class AccountService {
 	}
 	
 	@Transactional
-	@PreAuthorize("isAuthenticated() and #address.account.email == principal.username")
 	public Address setPrimary(Address address) {
 		addressRepository.findByAccountAndMasterIsTrue(address.getAccount())
 		.ifPresent(x -> {

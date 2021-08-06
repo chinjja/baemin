@@ -1,6 +1,7 @@
 package com.chinjja.app.web;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -48,6 +49,7 @@ public class AccountController {
 	
 	@PostMapping("/{id}/roles/{role}")
 	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("hasRole('ADMIN')")
 	public AccountRole addRole(
 			@PathVariable("id") Account account,
 			@PathVariable String role) {
@@ -56,6 +58,7 @@ public class AccountController {
 	
 	@DeleteMapping("/{id}/roles/{role}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
+	@PreAuthorize("hasRole('ADMIN')")
 	public void deleteRole(
 			@PathVariable("id") Account account,
 			@PathVariable String role
@@ -70,6 +73,7 @@ public class AccountController {
 	
 	@PostMapping("/{id}/addresses")
 	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Address createAddress(
 			@PathVariable("id") Account account,
 			@RequestBody AddressCreateDto dto) {
@@ -83,6 +87,7 @@ public class AccountController {
 	
 	@PostMapping("/{id}/products")
 	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Product createProduct(
 			@PathVariable("id") Account account,
 			@RequestBody ProductCreateDto dto) {
@@ -97,6 +102,7 @@ public class AccountController {
 	
 	@PostMapping("/{id}/orders")
 	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Order buy(@PathVariable("id") Account account) {
 		return baeminService.buy(account);
 	}
@@ -114,6 +120,7 @@ public class AccountController {
 	}
 	
 	@PutMapping("/{id}/products/{product_id}")
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public CartProduct addToCart(
 			@PathVariable("id") Account account,
 			@PathVariable("product_id") Product product,
