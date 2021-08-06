@@ -13,7 +13,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -65,7 +64,7 @@ public class BaeminLogicTests {
 		}
 		
 		@Test
-		@WithMockUser("seller@user.com")
+		@WithSeller
 		void createProducts() throws Exception {
 			val orange = Bridge.new_product(mvc, seller, ProductCreateDto.builder()
 					.code("ORANGE")
@@ -91,7 +90,7 @@ public class BaeminLogicTests {
 		}
 		
 		@Test
-		@WithMockUser("seller@user.com")
+		@WithSeller
 		void conflictProducts() throws Exception {
 			createProducts();
 			val ex = assertThrows(ResponseStatusException.class, () -> {
@@ -132,7 +131,7 @@ public class BaeminLogicTests {
 			}
 			
 			@Test
-			@WithMockUser("buyer@user.com")
+			@WithBuyer
 			void addToCart() throws Exception {
 				Bridge.addToCart(mvc, buyer, orange, 10);
 				
@@ -148,7 +147,7 @@ public class BaeminLogicTests {
 			}
 			
 			@Test
-			@WithMockUser("seller@user.com")
+			@WithSeller
 			void addToCartWithSeller() throws Exception {
 				assertThrows(Exception.class, () -> {
 					addToCart();
@@ -165,7 +164,7 @@ public class BaeminLogicTests {
 				}
 				
 				@Test
-				@WithMockUser("buyer@user.com")
+				@WithBuyer
 				void buy() throws Exception {
 					val order = Bridge.buy(mvc, buyer);
 					assertThat(order.getStatus()).isEqualTo(Status.IN_PROGRESS);
@@ -194,7 +193,7 @@ public class BaeminLogicTests {
 					}
 					
 					@Test
-					@WithMockUser("buyer@user.com")
+					@WithBuyer
 					void cancel() throws Exception {
 						val order1 = Bridge.cancel(mvc, order);
 						assertThat(order1.getStatus()).isEqualTo(Status.CANCELLED);
