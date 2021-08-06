@@ -139,7 +139,7 @@ public class BaeminService {
 	@Transactional
 	public Order buy(Account account) {
 		val cart = cartRepository.findByAccountAndOrderIsNull(account)
-				.orElseThrow(() -> new IllegalArgumentException("no cart"));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "not exists cart"));
 		return buy(cart);
 	}
 	

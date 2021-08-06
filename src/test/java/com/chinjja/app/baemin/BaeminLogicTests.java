@@ -154,6 +154,14 @@ public class BaeminLogicTests {
 				});
 			}
 			
+			@Test
+			@WithBuyer
+			void buyWhenNotExistsCart() throws Exception {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
+					Bridge.buy(mvc, buyer);
+				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+			}
 			
 			@Nested
 			class AddToCart {
