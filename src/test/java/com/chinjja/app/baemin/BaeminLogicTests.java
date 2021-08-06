@@ -12,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.dto.AccountCreateDto;
@@ -78,6 +80,16 @@ public class BaeminLogicTests {
 			assertThat(orange.getDescription()).isEqualTo("this is orange");
 			assertThat(orange.getPrice()).isEqualTo(new BigDecimal("1000"));
 			assertThat(orange.getQuantity()).isEqualTo(100);
+		}
+		
+		@Test
+		@WithMockUser("seller@user.com")
+		void conflictProducts() throws Exception {
+			createProducts();
+			val ex = assertThrows(ResponseStatusException.class, () -> {
+				createProducts();
+			});
+			assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT);
 		}
 		
 		@Test

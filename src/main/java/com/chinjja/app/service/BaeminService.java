@@ -3,8 +3,10 @@ package com.chinjja.app.service;
 import java.util.Date;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.chinjja.app.account.Account;
 import com.chinjja.app.domain.Cart;
@@ -38,6 +40,9 @@ public class BaeminService {
 	
 	@Transactional
 	public Product createProduct(Account seller, ProductCreateDto dto) {
+		if(productRepository.findBySellerAndCode(seller, dto.getCode()).isPresent()) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "seller or code is conflict");
+		}
 		val product = mapper.map(dto, Product.class);
 		product.setSeller(seller);
 		return productRepository.save(product);
