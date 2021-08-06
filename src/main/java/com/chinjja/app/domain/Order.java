@@ -1,15 +1,15 @@
 package com.chinjja.app.domain;
 
-import java.math.BigDecimal;
+import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 
 import com.chinjja.app.account.Account;
 
@@ -19,35 +19,32 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
-@Entity
+@Entity(name = "orders")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @With
-public class Product {
+public class Order {
+	public enum Status {
+		IN_PROGRESS,
+		CANCELLED,
+		COMPLETED,
+	}
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Enumerated(EnumType.STRING)
+	@NotNull
+	@Builder.Default
+	private Status status = Status.IN_PROGRESS;
+	
+	@NotNull
+	private Date createdAt;
+	
 	@ManyToOne
 	@NotNull
-	private Account seller;
-	
-	@PositiveOrZero
-	@NotNull
-	private BigDecimal price;
-	
-	@PositiveOrZero
-	@NotNull
-	private long quantity;
-	
-	@NotBlank
-	private String code;
-	
-	@NotBlank
-	private String title;
-	
-	@NotBlank
-	private String description;
+	private Account account;
 }

@@ -5,8 +5,10 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,9 +18,13 @@ import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
 import com.chinjja.app.account.dto.AddressCreateDto;
 import com.chinjja.app.account.service.AccountService;
+import com.chinjja.app.domain.Cart;
+import com.chinjja.app.domain.CartProduct;
+import com.chinjja.app.domain.Order;
+import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.dto.ProductCreateDto;
-import com.chinjja.app.service.ProductService;
+import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/accounts")
 public class AccountController {
 	private final AccountService accountService;
-	private final ProductService productService;
+	private final BaeminService baeminService;
 	
 	@GetMapping("/{id}")
 	public Account one(@PathVariable("id") Account account) {
@@ -80,12 +86,38 @@ public class AccountController {
 	public Product createProduct(
 			@PathVariable("id") Account account,
 			@RequestBody ProductCreateDto dto) {
-		return productService.create(account, dto);
+		return baeminService.createProduct(account, dto);
 	}
 	
 	@GetMapping("/{id}/products")
 	public Iterable<Product> getProducts(
 			@PathVariable("id") Account account) {
-		return productService.findBySeller(account);
+		return baeminService.findProductsBySeller(account);
+	}
+	
+	@PostMapping("/{id}/orders")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Order buy(@PathVariable("id") Account account) {
+		return baeminService.buy(account);
+	}
+	
+	@GetMapping("/{id}/orders")
+	public Iterable<Order> getOrders(
+			@PathVariable("id") Account account,
+			@RequestParam(required = false) Status status) {
+		return baeminService.findOrders(account, status);
+	}
+	
+	@GetMapping("/{id}/carts")
+	public Cart getCart(@PathVariable("id") Account account) {
+		return baeminService.findCart(account);
+	}
+	
+	@PutMapping("/{id}/products/{product_id}")
+	public CartProduct addToCart(
+			@PathVariable("id") Account account,
+			@PathVariable("product_id") Product product,
+			@RequestParam(defaultValue = "1") Integer quantity) {
+		return baeminService.addToCart(account, product, quantity);
 	}
 }
