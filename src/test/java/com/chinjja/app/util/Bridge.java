@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,20 +25,17 @@ public class Bridge {
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(toBytes(dto)))
-				.andExpect(status().isCreated())
 				.andReturn(), Product.class);
 	}
 	public static Product product(MockMvc mvc, Long id) throws Exception {
 		return to(mvc.perform(get("/api/products/{id}", id)
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), Product.class);
 	}
 	
 	public static Product[] products(MockMvc mvc, Account account) throws Exception {
 		return to(mvc.perform(get("/api/accounts/{id}/products", account.getId())
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), Product[].class);
 	}
 	
@@ -48,21 +44,18 @@ public class Bridge {
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(toBytes(dto)))
-				.andExpect(status().isCreated())
 				.andReturn(), Account.class);
 	}
 	
 	public static Account account(MockMvc mvc, long id) throws Exception {
 		return to(mvc.perform(get("/api/accounts/{id}", id)
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), Account.class);
 	}
 	
 	public static Address[] addresses(MockMvc mvc, Account account) throws Exception {
 		return to(mvc.perform(get("/api/accounts/{id}/addresses", account.getId())
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), Address[].class);
 	}
 	
@@ -70,14 +63,12 @@ public class Bridge {
 		return to(mvc.perform(put("/api/accounts/{id}/products/{product_id}", account.getId(), product.getId())
 						.param("quantity", ""+quantity)
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), CartProduct.class);
 	}
 	
 	public static Order buy(MockMvc mvc, Account account) throws Exception {
 		return to(mvc.perform(post("/api/accounts/{id}/orders", account.getId())
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isCreated())
 				.andReturn(), Order.class);
 	}
 	
@@ -85,21 +76,18 @@ public class Bridge {
 		return to(mvc.perform(get("/api/accounts/{id}/orders", account.getId())
 					.param("status", status == null ? null : status.toString())
 					.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), Order[].class);
 	}
 	
 	public static Order cancel(MockMvc mvc, Order order) throws Exception {
 		return to(mvc.perform(patch("/api/orders/{id}/cancel", order.getId())
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), Order.class);
 	}
 	
 	public static Order complete(MockMvc mvc, Order order) throws Exception {
 		return to(mvc.perform(patch("/api/orders/{id}/complete", order.getId())
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), Order.class);
 	}
 }

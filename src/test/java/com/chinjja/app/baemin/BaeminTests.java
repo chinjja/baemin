@@ -2,6 +2,7 @@ package com.chinjja.app.baemin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 
@@ -13,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.dto.AccountCreateDto;
@@ -136,6 +139,16 @@ public class BaeminTests {
 	
 	@Test
 	@Order(8)
+	void shouldFailWithoutAuthentication() throws Exception {
+		val orders = Bridge.orders(mvc, buyer, Status.IN_PROGRESS);
+		val ex = assertThrows(ResponseStatusException.class, () -> {
+			Bridge.cancel(mvc, orders[0]);
+		});
+		assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+	}
+	
+	@Test
+	@Order(9)
 	@WithMockUser("buyer@user.com")
 	void cancelOrder() throws Exception {
 		val orders = Bridge.orders(mvc, buyer, Status.IN_PROGRESS);
@@ -144,7 +157,7 @@ public class BaeminTests {
 	}
 	
 	@Test
-	@Order(9)
+	@Order(10)
 	void verifyProductsAfterCancel() throws Exception {
 		val orange2 = Bridge.product(mvc, orange.getId());
 		assertThat(orange2.getQuantity()).isEqualTo(100);
