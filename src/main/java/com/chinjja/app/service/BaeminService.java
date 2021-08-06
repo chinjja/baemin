@@ -81,6 +81,24 @@ public class BaeminService {
 	}
 	
 	@Transactional
+	public CartProduct plusQuantity(CartProduct cp, int quantity) {
+		if(quantity == 0) {
+			return cp;
+		}
+		val new_quantity = cp.getQuantity() + quantity;
+		if(new_quantity < 0) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot be less than zero");
+		}
+		cp.setQuantity(new_quantity);
+		return cartProductRepository.save(cp);
+	}
+	
+	@Transactional
+	public CartProduct minusQuantity(CartProduct cp, int quantity) {
+		return plusQuantity(cp, -quantity);
+	}
+	
+	@Transactional
 	public CartProduct addToCart(Cart cart, Product product, int quantity) {
 		val cartProduct = cartProductRepository.findByCartAndProduct(cart, product)
 				.orElseGet(() -> CartProduct.builder()
@@ -88,12 +106,7 @@ public class BaeminService {
 						.product(product)
 						.quantity(0)
 						.build());
-		val new_quantity = cartProduct.getQuantity() + quantity;
-		if(new_quantity < 0) {
-			throw new IllegalArgumentException("cannot be zero");
-		}
-		cartProduct.setQuantity(quantity);
-		return cartProductRepository.save(cartProduct);
+		return plusQuantity(cartProduct, quantity);
 	}
 	
 	@Transactional

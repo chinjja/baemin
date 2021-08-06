@@ -54,13 +54,15 @@ public class BaeminLogicTests {
 					.email("buyer@user.com")
 					.password("12345678")
 					.name("buyer")
-					.build());
+					.build())
+					.withPassword(null);
 
 			seller = accountService.create(AccountCreateDto.builder()
 					.email("seller@user.com")
 					.password("12345678")
 					.name("seller")
-					.build());
+					.build())
+					.withPassword(null);
 		}
 		
 		@Test
@@ -133,7 +135,12 @@ public class BaeminLogicTests {
 			@Test
 			@WithBuyer
 			void addToCart() throws Exception {
-				Bridge.addToCart(mvc, buyer, orange, 10);
+				val cartProduct = Bridge.addToCart(mvc, buyer, orange, 10);
+				assertThat(cartProduct.getQuantity()).isEqualTo(10);
+				assertThat(cartProduct.getProduct()).isEqualTo(orange);
+				
+				val cartProduct2 = Bridge.plus_quantity(mvc, cartProduct, 5);
+				assertThat(cartProduct2.getQuantity()).isEqualTo(15);
 				
 				val orange2 = Bridge.product(mvc, orange.getId());
 				assertThat(orange2.getQuantity()).isEqualTo(100);

@@ -73,6 +73,13 @@ public class Bridge {
 				.andReturn(), CartProduct.class);
 	}
 	
+	public static CartProduct plus_quantity(MockMvc mvc, CartProduct cartProduct, int quantity) throws Exception {
+		return to(mvc.perform(patch("/api/cart-products/{id}/quantity", cartProduct.getId())
+						.param("quantity", ""+quantity)
+						.accept(MediaType.APPLICATION_JSON))
+				.andReturn(), CartProduct.class);
+	}
+	
 	public static Order buy(MockMvc mvc, Account account) throws Exception {
 		return to(mvc.perform(post("/api/accounts/{id}/orders", account.getId())
 						.accept(MediaType.APPLICATION_JSON))
