@@ -2,10 +2,13 @@ package com.chinjja.app.service;
 
 import java.util.Date;
 
+import javax.validation.Valid;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.chinjja.app.account.Account;
@@ -27,6 +30,7 @@ import lombok.val;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Validated
 public class BaeminService {
 	private final ProductRepository productRepository;
 	private final CartRepository cartRepository;
@@ -39,7 +43,7 @@ public class BaeminService {
 	}};
 	
 	@Transactional
-	public Product createProduct(Account seller, ProductCreateDto dto) {
+	public Product createProduct(Account seller, @Valid ProductCreateDto dto) {
 		if(productRepository.findBySellerAndCode(seller, dto.getCode()).isPresent()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "seller or code is conflict");
 		}
@@ -53,7 +57,7 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	public Product updateProduct(Product product, ProductUpdateDto dto) {
+	public Product updateProduct(Product product, @Valid ProductUpdateDto dto) {
 		mapper.map(dto, product);
 		return productRepository.save(product);
 	}
@@ -65,7 +69,7 @@ public class BaeminService {
 		}
 		val new_quantity = product.getQuantity() + quantity;
 		if(new_quantity < 0) {
-			throw new IllegalArgumentException("cannot be zero");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot be less than zero");
 		}
 		product.setQuantity(new_quantity);
 		return productRepository.save(product);
