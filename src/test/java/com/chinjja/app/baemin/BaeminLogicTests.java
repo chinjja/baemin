@@ -288,6 +288,15 @@ public class BaeminLogicTests {
 						assertThat(orders).hasSize(1).contains(orders);
 					}
 					
+					@Test
+					@WithBuyer
+					void whenPlusQuantity_thenShouldReturn400() throws Exception {
+						val ex = assertThrows(ResponseStatusException.class, () -> {
+							Bridge.plus_quantity(mvc, orangeInCart, 5);
+						});
+						assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+					}
+					
 					@Nested
 					class Cancel {
 						Order cancelled;

@@ -85,6 +85,9 @@ public class BaeminService {
 		if(quantity == 0) {
 			return cp;
 		}
+		if(cp.getCart().getOrder() != null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot modify quantity after buy");
+		}
 		val new_quantity = cp.getQuantity() + quantity;
 		if(new_quantity < 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot be less than zero");
