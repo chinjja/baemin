@@ -198,6 +198,13 @@ public class BaeminLogicTests {
 					});
 				}
 				
+				@Test
+				@WithBuyer
+				void addToCart() throws Exception {
+					val orangeInCart = Bridge.add_to_cart(mvc, buyer, orange, 5);
+					assertThat(orangeInCart.getQuantity()).isEqualTo(15);
+				}
+				
 				@Nested
 				class Buy {
 					Order order;
