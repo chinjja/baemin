@@ -1,4 +1,4 @@
-package com.chinjja.app.dto;
+package com.chinjja.app.repo;
 
 import java.util.Optional;
 

@@ -17,11 +17,11 @@ import com.chinjja.app.domain.CartProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
-import com.chinjja.app.dto.CartProductRepository;
-import com.chinjja.app.dto.CartRepository;
-import com.chinjja.app.dto.OrderRepository;
 import com.chinjja.app.dto.ProductCreateDto;
 import com.chinjja.app.dto.ProductUpdateDto;
+import com.chinjja.app.repo.CartProductRepository;
+import com.chinjja.app.repo.CartRepository;
+import com.chinjja.app.repo.OrderRepository;
 import com.chinjja.app.repo.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
