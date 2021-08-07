@@ -54,6 +54,10 @@ public class BaeminService {
 		return sellerRepository.save(seller);
 	}
 	
+	public Iterable<Seller> findAllSeller() {
+		return sellerRepository.findAll();
+	}
+	
 	@Transactional
 	public Product createProduct(Seller seller, @Valid ProductInfo dto) {
 		if(productRepository.findBySellerAndInfoCode(seller, dto.getCode()).isPresent()) {

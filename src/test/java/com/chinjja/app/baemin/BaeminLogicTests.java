@@ -76,6 +76,12 @@ public class BaeminLogicTests {
 		}
 		
 		@Test
+		void sellers() throws Exception {
+			val sellers = Bridge.sellers(mvc);
+			assertThat(sellers).hasSize(1).contains(seller);
+		}
+		
+		@Test
 		@WithSeller
 		void createProducts() throws Exception {
 			val orange = Bridge.new_product(mvc, seller, ProductInfo.builder()
