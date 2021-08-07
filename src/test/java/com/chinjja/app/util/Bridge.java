@@ -18,11 +18,21 @@ import com.chinjja.app.domain.CartProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
+import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.ProductCreateDto;
+import com.chinjja.app.dto.SellerInfo;
 
 public class Bridge {
-	public static Product new_product(MockMvc mvc, Account seller, ProductCreateDto dto) throws Exception {
-		return to(mvc.perform(post("/api/accounts/{id}/products", seller.getId())
+	public static Seller new_seller(MockMvc mvc, Account account, SellerInfo dto) throws Exception {
+		return to(mvc.perform(post("/api/accounts/{id}/sellers", account.getId())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(toBytes(dto)))
+				.andReturn(), Seller.class);
+	}
+	
+	public static Product new_product(MockMvc mvc, Seller seller, ProductCreateDto dto) throws Exception {
+		return to(mvc.perform(post("/api/sellers/{id}/products", seller.getId())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(toBytes(dto)))
@@ -34,8 +44,8 @@ public class Bridge {
 				.andReturn(), Product.class);
 	}
 	
-	public static Product[] products(MockMvc mvc, Account account) throws Exception {
-		return to(mvc.perform(get("/api/accounts/{id}/products", account.getId())
+	public static Product[] products(MockMvc mvc, Seller seller) throws Exception {
+		return to(mvc.perform(get("/api/sellers/{id}/products", seller.getId())
 						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Product[].class);
 	}

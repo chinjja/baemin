@@ -24,7 +24,9 @@ import com.chinjja.app.domain.CartProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
+import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.ProductCreateDto;
+import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.service.BaeminService;
 import com.chinjja.app.util.Bridge;
 
@@ -47,7 +49,8 @@ public class BaeminLogicTests {
 	@Nested
 	class GenUsers {
 		Account buyer;
-		Account seller;
+		Account seller_account;
+		Seller seller;
 		
 		@BeforeEach
 		void setup() throws Exception {
@@ -58,12 +61,17 @@ public class BaeminLogicTests {
 					.build())
 					.withPassword(null);
 
-			seller = accountService.create(AccountCreateDto.builder()
+			seller_account = accountService.create(AccountCreateDto.builder()
 					.email("seller@user.com")
 					.password("12345678")
 					.name("seller")
 					.build())
 					.withPassword(null);
+			
+			seller = baeminService.createSeller(seller_account, SellerInfo.builder()
+					.name("I am seller")
+					.description("ok")
+					.build());
 		}
 		
 		@Test

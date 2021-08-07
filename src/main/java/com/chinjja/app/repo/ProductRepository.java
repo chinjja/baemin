@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.chinjja.app.account.Account;
 import com.chinjja.app.domain.Product;
+import com.chinjja.app.domain.Seller;
 
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
-	Iterable<Product> findAllBySeller(Account account);
-	Optional<Product> findBySellerAndCode(Account seller, String code);
+	Iterable<Product> findAllBySeller(Seller seller);
+	Optional<Product> findBySellerAndCode(Seller seller, String code);
 }

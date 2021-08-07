@@ -17,12 +17,15 @@ import com.chinjja.app.domain.CartProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
+import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.ProductCreateDto;
 import com.chinjja.app.dto.ProductUpdateDto;
+import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.repo.CartProductRepository;
 import com.chinjja.app.repo.CartRepository;
 import com.chinjja.app.repo.OrderRepository;
 import com.chinjja.app.repo.ProductRepository;
+import com.chinjja.app.repo.SellerRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -36,6 +39,7 @@ public class BaeminService {
 	private final CartRepository cartRepository;
 	private final CartProductRepository cartProductRepository;
 	private final OrderRepository orderRepository;
+	private final SellerRepository sellerRepository;
 	
 	private final ModelMapper mapper = new ModelMapper() {{
 		getConfiguration()
@@ -43,7 +47,14 @@ public class BaeminService {
 	}};
 	
 	@Transactional
-	public Product createProduct(Account seller, @Valid ProductCreateDto dto) {
+	public Seller createSeller(Account account, @Valid SellerInfo dto) {
+		val seller = mapper.map(dto, Seller.class);
+		seller.setAccount(account);
+		return sellerRepository.save(seller);
+	}
+	
+	@Transactional
+	public Product createProduct(Seller seller, @Valid ProductCreateDto dto) {
 		if(productRepository.findBySellerAndCode(seller, dto.getCode()).isPresent()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "seller or code is conflict");
 		}
@@ -52,7 +63,7 @@ public class BaeminService {
 		return productRepository.save(product);
 	}
 	
-	public Iterable<Product> findProductsBySeller(Account seller) {
+	public Iterable<Product> findProductsBySeller(Seller seller) {
 		return productRepository.findAllBySeller(seller);
 	}
 	

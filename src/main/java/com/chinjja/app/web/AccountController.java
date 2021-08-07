@@ -23,8 +23,9 @@ import com.chinjja.app.domain.Cart;
 import com.chinjja.app.domain.CartProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
+import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.domain.Product;
-import com.chinjja.app.dto.ProductCreateDto;
+import com.chinjja.app.domain.Seller;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
@@ -85,21 +86,6 @@ public class AccountController {
 		return accountService.getAddresses(account);
 	}
 	
-	@PostMapping("/{id}/products")
-	@ResponseStatus(HttpStatus.CREATED)
-	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
-	public Product createProduct(
-			@PathVariable("id") Account account,
-			@RequestBody ProductCreateDto dto) {
-		return baeminService.createProduct(account, dto);
-	}
-	
-	@GetMapping("/{id}/products")
-	public Iterable<Product> getProducts(
-			@PathVariable("id") Account account) {
-		return baeminService.findProductsBySeller(account);
-	}
-	
 	@PostMapping("/{id}/orders")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
@@ -127,4 +113,13 @@ public class AccountController {
 			@RequestParam(defaultValue = "1") Integer quantity) {
 		return baeminService.addToCart(account, product, quantity);
 	}
+	
+	@PostMapping("/{id}/sellers")
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
+	public Seller createSeller(
+			@PathVariable("id") Account account,
+			@RequestBody SellerInfo dto) {
+		return baeminService.createSeller(account, dto);
+	}
+	
 }

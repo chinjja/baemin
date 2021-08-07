@@ -27,7 +27,7 @@ public class ProductController {
 	}
 	
 	@PatchMapping("/{id}")
-	@PreAuthorize("isAuthenticated() and #product.seller.email == principal.username")
+	@PreAuthorize("isAuthenticated() and #product.seller.account.email == principal.username")
 	public Product patch(
 			@PathVariable("id") Product product,
 			@RequestBody ProductUpdateDto dto) {
@@ -35,7 +35,7 @@ public class ProductController {
 	}
 	
 	@PatchMapping("/{id}/quantity")
-	@PreAuthorize("isAuthenticated() and #product.seller.email == principal.username")
+	@PreAuthorize("isAuthenticated() and #product.seller.account.email == principal.username")
 	public Product quantity(
 			@PathVariable("id") Product product,
 			@RequestParam Integer quantity) {

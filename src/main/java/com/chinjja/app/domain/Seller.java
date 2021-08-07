@@ -1,17 +1,15 @@
 package com.chinjja.app.domain;
 
-import java.math.BigDecimal;
-
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 
 import com.chinjja.app.account.Account;
+import com.chinjja.app.dto.SellerInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,29 +23,15 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-public class Product {
+public class Seller {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@ManyToOne
 	@NotNull
-	private Seller seller;
+	private Account account;
 	
-	@PositiveOrZero
-	@NotNull
-	private BigDecimal price;
-	
-	@PositiveOrZero
-	@NotNull
-	private long quantity;
-	
-	@NotBlank
-	private String code;
-	
-	@NotBlank
-	private String title;
-	
-	@NotBlank
-	private String description;
+	@Embedded
+	private SellerInfo info;
 }
