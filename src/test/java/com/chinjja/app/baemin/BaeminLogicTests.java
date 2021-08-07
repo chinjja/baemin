@@ -26,6 +26,7 @@ import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.ProductInfo;
+import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.service.BaeminService;
 import com.chinjja.app.util.Bridge;
@@ -133,6 +134,43 @@ public class BaeminLogicTests {
 						.price(new BigDecimal("500"))
 						.quantity(10)
 						.build());
+			}
+			
+			@Test
+			@WithSeller
+			void whenUpdateProduct_thenShouldSuccess() throws Exception {
+				val desc_change = Bridge.update(mvc, orange, ProductUpdateDto.builder()
+						.description("this is not orange")
+						.build());
+				
+				assertThat(desc_change.getInfo()).isEqualTo(orange.getInfo()
+						.withDescription("this is not orange"));
+				
+				val price_change = Bridge.update(mvc, orange, ProductUpdateDto.builder()
+						.price(new BigDecimal("100000"))
+						.quantity(9999)
+						.build());
+				
+				assertThat(price_change.getInfo()).isEqualTo(orange.getInfo()
+						.withPrice(new BigDecimal("100000"))
+						.withQuantity(9999));
+			}
+			
+			@Test
+			void whenUpdateProduct_thenShouldThrow401() throws Exception {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
+					whenUpdateProduct_thenShouldSuccess();
+				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+			}
+			
+			@Test
+			@WithBuyer
+			void whenUpdateProduct_thenShouldThrow403() throws Exception {
+				val ex = assertThrows(ResponseStatusException.class, () -> {
+					whenUpdateProduct_thenShouldSuccess();
+				});
+				assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
 			}
 			
 			@Test
