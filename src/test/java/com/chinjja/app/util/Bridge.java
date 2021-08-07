@@ -19,7 +19,7 @@ import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
-import com.chinjja.app.dto.ProductCreateDto;
+import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.SellerInfo;
 
 public class Bridge {
@@ -31,7 +31,7 @@ public class Bridge {
 				.andReturn(), Seller.class);
 	}
 	
-	public static Product new_product(MockMvc mvc, Seller seller, ProductCreateDto dto) throws Exception {
+	public static Product new_product(MockMvc mvc, Seller seller, ProductInfo dto) throws Exception {
 		return to(mvc.perform(post("/api/sellers/{id}/products", seller.getId())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)

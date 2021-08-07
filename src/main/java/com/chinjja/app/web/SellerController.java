@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
-import com.chinjja.app.dto.ProductCreateDto;
+import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class SellerController {
 	@PreAuthorize("isAuthenticated() and #seller.account.email == principal.username")
 	public Product createProduct(
 			@PathVariable("id") Seller seller,
-			@RequestBody ProductCreateDto dto) {
+			@RequestBody ProductInfo dto) {
 		return baeminService.createProduct(seller, dto);
 	}
 	

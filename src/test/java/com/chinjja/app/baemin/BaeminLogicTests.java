@@ -25,7 +25,7 @@ import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
-import com.chinjja.app.dto.ProductCreateDto;
+import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.service.BaeminService;
 import com.chinjja.app.util.Bridge;
@@ -77,7 +77,7 @@ public class BaeminLogicTests {
 		@Test
 		@WithSeller
 		void createProducts() throws Exception {
-			val orange = Bridge.new_product(mvc, seller, ProductCreateDto.builder()
+			val orange = Bridge.new_product(mvc, seller, ProductInfo.builder()
 					.code("ORANGE")
 					.title("fresh orange")
 					.description("this is orange")
@@ -85,11 +85,13 @@ public class BaeminLogicTests {
 					.quantity(100)
 					.build());
 			
-			assertThat(orange.getCode()).isEqualTo("ORANGE");
-			assertThat(orange.getTitle()).isEqualTo("fresh orange");
-			assertThat(orange.getDescription()).isEqualTo("this is orange");
-			assertThat(orange.getPrice()).isEqualTo(new BigDecimal("1000"));
-			assertThat(orange.getQuantity()).isEqualTo(100);
+			assertThat(orange.getInfo()).isEqualTo(ProductInfo.builder()
+					.code("ORANGE")
+					.title("fresh orange")
+					.description("this is orange")
+					.price(new BigDecimal("1000"))
+					.quantity(100)
+					.build());
 		}
 		
 		@Test
@@ -116,7 +118,7 @@ public class BaeminLogicTests {
 			
 			@BeforeEach
 			void setup() {
-				orange = baeminService.createProduct(seller, ProductCreateDto.builder()
+				orange = baeminService.createProduct(seller, ProductInfo.builder()
 						.code("ORANGE")
 						.title("fresh orange")
 						.description("this is orange")
@@ -124,7 +126,7 @@ public class BaeminLogicTests {
 						.quantity(100)
 						.build());
 
-				banana = baeminService.createProduct(seller, ProductCreateDto.builder()
+				banana = baeminService.createProduct(seller, ProductInfo.builder()
 						.code("BANANA")
 						.title("dirty banana")
 						.description("this is banana")
@@ -137,7 +139,7 @@ public class BaeminLogicTests {
 			@WithSeller
 			void shouldBeChangedToZero() throws Exception {
 				val orange2 = Bridge.plus_quantity(mvc, orange, -100);
-				assertThat(orange2.getQuantity()).isEqualTo(0);
+				assertThat(orange2.getInfo().getQuantity()).isEqualTo(0);
 			}
 			
 			@Test
@@ -284,10 +286,10 @@ public class BaeminLogicTests {
 				@Test
 				void shouldKeepQuantity() throws Exception {
 					val orange2 = Bridge.product(mvc, orange.getId());
-					assertThat(orange2.getQuantity()).isEqualTo(100);
+					assertThat(orange2.getInfo().getQuantity()).isEqualTo(100);
 					
 					val banana2 = Bridge.product(mvc, banana.getId());
-					assertThat(banana2.getQuantity()).isEqualTo(10);
+					assertThat(banana2.getInfo().getQuantity()).isEqualTo(10);
 				}
 				
 				@Nested
@@ -302,10 +304,10 @@ public class BaeminLogicTests {
 					@Test
 					void shouldConsumeProductQuantity() throws Exception {
 						val orange2 = Bridge.product(mvc, orange.getId());
-						assertThat(orange2.getQuantity()).isEqualTo(90);
+						assertThat(orange2.getInfo().getQuantity()).isEqualTo(90);
 
 						val banana2 = Bridge.product(mvc, banana.getId());
-						assertThat(banana2.getQuantity()).isEqualTo(0);
+						assertThat(banana2.getInfo().getQuantity()).isEqualTo(0);
 					}
 					
 					@Test
@@ -342,10 +344,10 @@ public class BaeminLogicTests {
 						@Test
 						void productStatusShouldBeRestored() throws Exception {
 							val orange2 = Bridge.product(mvc, orange.getId());
-							assertThat(orange2.getQuantity()).isEqualTo(100);
+							assertThat(orange2.getInfo().getQuantity()).isEqualTo(100);
 
 							val banana2 = Bridge.product(mvc, banana.getId());
-							assertThat(banana2.getQuantity()).isEqualTo(10);
+							assertThat(banana2.getInfo().getQuantity()).isEqualTo(10);
 						}
 						
 						@Test
@@ -384,10 +386,10 @@ public class BaeminLogicTests {
 						@Test
 						void productStatusShouldBeRetained() throws Exception {
 							val orange2 = Bridge.product(mvc, orange.getId());
-							assertThat(orange2.getQuantity()).isEqualTo(90);
+							assertThat(orange2.getInfo().getQuantity()).isEqualTo(90);
 
 							val banana2 = Bridge.product(mvc, banana.getId());
-							assertThat(banana2.getQuantity()).isEqualTo(0);
+							assertThat(banana2.getInfo().getQuantity()).isEqualTo(0);
 						}
 						
 						@Test

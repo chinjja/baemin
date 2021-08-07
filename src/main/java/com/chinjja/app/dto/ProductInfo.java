@@ -6,19 +6,18 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 import lombok.With;
 
-@Value
-@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @With
-public class ProductCreateDto {
+public class ProductInfo {
 	@PositiveOrZero
 	@NotNull
 	BigDecimal price;

@@ -18,7 +18,7 @@ import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
-import com.chinjja.app.dto.ProductCreateDto;
+import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.repo.CartProductRepository;
@@ -48,17 +48,19 @@ public class BaeminService {
 	
 	@Transactional
 	public Seller createSeller(Account account, @Valid SellerInfo dto) {
-		val seller = mapper.map(dto, Seller.class);
+		val seller = new Seller();
+		seller.setInfo(dto);
 		seller.setAccount(account);
 		return sellerRepository.save(seller);
 	}
 	
 	@Transactional
-	public Product createProduct(Seller seller, @Valid ProductCreateDto dto) {
-		if(productRepository.findBySellerAndCode(seller, dto.getCode()).isPresent()) {
+	public Product createProduct(Seller seller, @Valid ProductInfo dto) {
+		if(productRepository.findBySellerAndInfoCode(seller, dto.getCode()).isPresent()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "seller or code is conflict");
 		}
-		val product = mapper.map(dto, Product.class);
+		val product = new Product();
+		product.setInfo(dto);
 		product.setSeller(seller);
 		return productRepository.save(product);
 	}
@@ -69,7 +71,7 @@ public class BaeminService {
 	
 	@Transactional
 	public Product updateProduct(Product product, @Valid ProductUpdateDto dto) {
-		mapper.map(dto, product);
+		mapper.map(dto, product.getInfo());
 		return productRepository.save(product);
 	}
 	
@@ -78,11 +80,12 @@ public class BaeminService {
 		if(quantity == 0) {
 			return product;
 		}
-		val new_quantity = product.getQuantity() + quantity;
+		val info = product.getInfo();
+		val new_quantity = info.getQuantity() + quantity;
 		if(new_quantity < 0) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot be less than zero");
 		}
-		product.setQuantity(new_quantity);
+		info.setQuantity(new_quantity);
 		return productRepository.save(product);
 	}
 	

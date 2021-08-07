@@ -9,5 +9,5 @@ import com.chinjja.app.domain.Seller;
 
 public interface ProductRepository extends PagingAndSortingRepository<Product, Long> {
 	Iterable<Product> findAllBySeller(Seller seller);
-	Optional<Product> findBySellerAndCode(Seller seller, String code);
+	Optional<Product> findBySellerAndInfoCode(Seller seller, String code);
 }
