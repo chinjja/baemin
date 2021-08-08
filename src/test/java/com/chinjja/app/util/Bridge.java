@@ -32,6 +32,12 @@ public class Bridge {
 				.andReturn(), Seller.class);
 	}
 	
+	public static Seller seller(MockMvc mvc, Long id) throws Exception {
+		return to(mvc.perform(get("/api/sellers/{id}", id)
+				.accept(MediaType.APPLICATION_JSON))
+		.andReturn(), Seller.class);
+	}
+	
 	public static Seller[] sellers(MockMvc mvc) throws Exception {
 		return to(mvc.perform(get("/api/sellers")
 						.accept(MediaType.APPLICATION_JSON))

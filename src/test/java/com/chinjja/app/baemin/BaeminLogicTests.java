@@ -76,6 +76,12 @@ public class BaeminLogicTests {
 		}
 		
 		@Test
+		void seller() throws Exception {
+			val get_seller = Bridge.seller(mvc, seller.getId());
+			assertThat(seller).isEqualTo(get_seller);
+		}
+		
+		@Test
 		void sellers() throws Exception {
 			val sellers = Bridge.sellers(mvc);
 			assertThat(sellers).hasSize(1).contains(seller);

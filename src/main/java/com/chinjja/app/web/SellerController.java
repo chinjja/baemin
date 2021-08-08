@@ -42,4 +42,9 @@ public class SellerController {
 	public Iterable<Seller> all() {
 		return baeminService.findAllSeller();
 	}
+	
+	@GetMapping("/{id}")
+	public Seller one(@PathVariable("id") Seller seller) {
+		return seller;
+	}
 }
