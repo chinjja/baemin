@@ -1,0 +1,30 @@
+package com.chinjja.app.security.jwt;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+
+@RestController
+@CrossOrigin
+@RequiredArgsConstructor
+public class JwtAuthenticationController {
+	private final AuthenticationManager authenticationManager;
+	private final JwtToken jwtToken;
+	
+	@PostMapping("/api/signin")
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+		val username = authenticationRequest.getUsername();
+		val password = authenticationRequest.getPassword();
+		val auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		val token = jwtToken.generateToken((UserDetails)auth.getPrincipal());
+		return ResponseEntity.ok(new JwtResponse(token));
+	}
+}
