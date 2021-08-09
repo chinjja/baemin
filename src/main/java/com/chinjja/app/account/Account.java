@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.With;
 
 @Entity
@@ -35,6 +36,7 @@ public class Account {
 	
 	@NotNull
 	@JsonIgnore
+	@ToString.Exclude
 	private String password;
 	
 	@NotBlank
