@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.chinjja.app.account.service.AccountService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 
@@ -18,6 +20,7 @@ import lombok.val;
 public class JwtAuthenticationController {
 	private final AuthenticationManager authenticationManager;
 	private final JwtToken jwtToken;
+	private final AccountService accountService;
 	
 	@PostMapping("/api/signin")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
@@ -25,6 +28,7 @@ public class JwtAuthenticationController {
 		val password = authenticationRequest.getPassword();
 		val auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		val token = jwtToken.generateToken((UserDetails)auth.getPrincipal());
-		return ResponseEntity.ok(new JwtResponse(token));
+		val id = accountService.findByEmail(username).getId();
+		return ResponseEntity.ok(new JwtResponse(id, token));
 	}
 }
