@@ -6,6 +6,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import com.chinjja.app.dto.ProductInfo;
@@ -22,6 +24,7 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"seller_id", "code"}))
 public class Product {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
