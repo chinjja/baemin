@@ -23,12 +23,12 @@ public class JwtAuthenticationController {
 	private final AccountService accountService;
 	
 	@PostMapping("/api/signin")
-	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-		val username = authenticationRequest.getUsername();
-		val password = authenticationRequest.getPassword();
-		val auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest jwtRequest) throws Exception {
+		val email = jwtRequest.getEmail();
+		val password = jwtRequest.getPassword();
+		val auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 		val token = jwtToken.generateToken((UserDetails)auth.getPrincipal());
-		val id = accountService.findByEmail(username).getId();
+		val id = accountService.findByEmail(email).getId();
 		return ResponseEntity.ok(new JwtResponse(id, token));
 	}
 }
