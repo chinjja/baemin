@@ -112,8 +112,8 @@ public class Bridge {
 				.andReturn(), CartProduct.class);
 	}
 	
-	public static Order buy(MockMvc mvc, Account account) throws Exception {
-		return to(mvc.perform(post("/api/accounts/{id}/orders", account.getId())
+	public static Order buy(MockMvc mvc, Cart cart) throws Exception {
+		return to(mvc.perform(post("/api/carts/{id}/orders", cart.getId())
 						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Order.class);
 	}

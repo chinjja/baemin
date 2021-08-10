@@ -244,15 +244,6 @@ public class BaeminLogicTests {
 			}
 			
 			@Test
-			@WithBuyer
-			void whenBuy_thenShouldReturn400() throws Exception {
-				val ex = assertThrows(ResponseStatusException.class, () -> {
-					Bridge.buy(mvc, buyer);
-				});
-				assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-			}
-			
-			@Test
 			void whenTakeCart_thenShouldReturn404() throws Exception {
 				val ex = assertThrows(ResponseStatusException.class, () -> {
 					Bridge.cart(mvc, buyer);
@@ -274,23 +265,26 @@ public class BaeminLogicTests {
 				@Test
 				@WithBuyer
 				void buy() throws Exception {
-					val order = Bridge.buy(mvc, buyer);
+					val cart = baeminService.findCart(buyer);
+					val order = Bridge.buy(mvc, cart);
 					assertThat(order.getStatus()).isEqualTo(Status.IN_PROGRESS);
 				}
 				
 				@Test
 				@WithSeller
 				void whenBuy_thenShouldThrow403() throws Exception {
+					val cart = baeminService.findCart(buyer);
 					val ex = assertThrows(ResponseStatusException.class, () -> {
-						Bridge.buy(mvc, buyer);
+						Bridge.buy(mvc, cart);
 					});
 					assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
 				}
 				
 				@Test
 				void whenBuy_thenShouldThrow401() throws Exception {
+					val cart = baeminService.findCart(buyer);
 					val ex = assertThrows(ResponseStatusException.class, () -> {
-						Bridge.buy(mvc, buyer);
+						Bridge.buy(mvc, cart);
 					});
 					assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
 				}
@@ -348,7 +342,8 @@ public class BaeminLogicTests {
 					
 					@BeforeEach
 					void setup() {
-						order = baeminService.buy(buyer);
+						val cart = baeminService.findCart(buyer);
+						order = baeminService.buy(cart);
 					}
 					
 					@Test
@@ -401,15 +396,6 @@ public class BaeminLogicTests {
 						}
 						
 						@Test
-						@WithBuyer
-						void whenBuy_thenShouldReturn400() throws Exception {
-							val ex = assertThrows(ResponseStatusException.class, () -> {
-								Bridge.buy(mvc, buyer);
-							});
-							assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-						}
-						
-						@Test
 						void whenTakeCart_thenShouldReturn404() throws Exception {
 							val ex = assertThrows(ResponseStatusException.class, () -> {
 								Bridge.cart(mvc, buyer);
@@ -440,15 +426,6 @@ public class BaeminLogicTests {
 
 							val banana2 = Bridge.product(mvc, banana.getId());
 							assertThat(banana2.getInfo().getQuantity()).isEqualTo(0);
-						}
-						
-						@Test
-						@WithBuyer
-						void whenBuy_thenShouldReturn400() throws Exception {
-							val ex = assertThrows(ResponseStatusException.class, () -> {
-								Bridge.buy(mvc, buyer);
-							});
-							assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
 						}
 						
 						@Test

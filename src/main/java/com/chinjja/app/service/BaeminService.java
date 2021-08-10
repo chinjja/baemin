@@ -172,13 +172,6 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	public Order buy(Account account) {
-		val cart = cartRepository.findByAccountAndOrderIsNull(account)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "not exists cart"));
-		return buy(cart);
-	}
-	
-	@Transactional
 	public Order cancel(Order order) {
 		val cart = cartRepository.findByOrder(order).get();
 		for(val i : cartProductRepository.findAllByCart(cart)) {

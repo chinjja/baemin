@@ -86,13 +86,6 @@ public class AccountController {
 		return accountService.getAddresses(account);
 	}
 	
-	@PostMapping("/{id}/orders")
-	@ResponseStatus(HttpStatus.CREATED)
-	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
-	public Order buy(@PathVariable("id") Account account) {
-		return baeminService.buy(account);
-	}
-	
 	@GetMapping("/{id}/orders")
 	public Iterable<Order> getOrders(
 			@PathVariable("id") Account account,
