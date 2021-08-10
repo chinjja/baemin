@@ -173,6 +173,9 @@ public class BaeminService {
 	
 	@Transactional
 	public Order cancel(Order order) {
+		if(order.getStatus() != Status.IN_PROGRESS) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "when status is in progress you can cancel it");
+		}
 		val cart = cartRepository.findByOrder(order).get();
 		for(val i : cartProductRepository.findAllByCart(cart)) {
 			plusQuantity(i.getProduct(), i.getQuantity());
@@ -183,6 +186,9 @@ public class BaeminService {
 	
 	@Transactional
 	public Order complete(Order order) {
+		if(order.getStatus() != Status.IN_PROGRESS) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "when status is in progress you can complete it");
+		}
 		order.setStatus(Status.COMPLETED);
 		return orderRepository.save(order);
 	}

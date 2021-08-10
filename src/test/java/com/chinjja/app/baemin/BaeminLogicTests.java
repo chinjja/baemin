@@ -403,6 +403,20 @@ public class BaeminLogicTests {
 						}
 						
 						@Test
+						@WithBuyer
+						void shouldNotBeModified() throws Exception {
+							val e1 = assertThrows(ResponseStatusException.class, () -> {
+								Bridge.cancel(mvc, cancelled);
+							});
+							assertThat(e1.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+							
+							val e2 = assertThrows(ResponseStatusException.class, () -> {
+								Bridge.complete(mvc, cancelled);
+							});
+							assertThat(e2.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+						}
+						
+						@Test
 						void productStatusShouldBeRestored() throws Exception {
 							val orange2 = Bridge.product(mvc, orange.getId());
 							assertThat(orange2.getInfo().getQuantity()).isEqualTo(100);
@@ -433,6 +447,20 @@ public class BaeminLogicTests {
 						@BeforeEach
 						void setup() {
 							completed = baeminService.complete(order);
+						}
+						
+						@Test
+						@WithBuyer
+						void shouldNotBeModified() throws Exception {
+							val e1 = assertThrows(ResponseStatusException.class, () -> {
+								Bridge.cancel(mvc, completed);
+							});
+							assertThat(e1.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+							
+							val e2 = assertThrows(ResponseStatusException.class, () -> {
+								Bridge.complete(mvc, completed);
+							});
+							assertThat(e2.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
 						}
 						
 						@Test
