@@ -142,4 +142,11 @@ public class Bridge {
 						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Cart.class);
 	}
+	
+	public static CartProduct[] cartProducts(MockMvc mvc, Cart cart) throws Exception {
+		return to(mvc.perform(get("/api/carts/{id}/products", cart.getId())
+				.accept(MediaType.APPLICATION_JSON))
+		.andReturn(), CartProduct[].class);
+		
+	}
 }

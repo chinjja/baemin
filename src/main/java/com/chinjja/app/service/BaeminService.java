@@ -186,4 +186,8 @@ public class BaeminService {
 		order.setStatus(Status.COMPLETED);
 		return orderRepository.save(order);
 	}
+	
+	public Iterable<CartProduct> findCartProducts(Cart cart) {
+		return cartProductRepository.findAllByCart(cart);
+	}
 }

@@ -264,6 +264,22 @@ public class BaeminLogicTests {
 				
 				@Test
 				@WithBuyer
+				void findAll() throws Exception {
+					val cart = baeminService.findCart(buyer);
+					val list = Bridge.cartProducts(mvc, cart);
+					assertThat(list).hasSize(2).contains(orangeInCart, bananaInCart);
+				}
+				
+				@Test
+				void whenFindAll_thenShouldThrow403() throws Exception {
+					val ex = assertThrows(ResponseStatusException.class, () -> {
+						findAll();
+					});
+					assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+				}
+				
+				@Test
+				@WithBuyer
 				void buy() throws Exception {
 					val cart = baeminService.findCart(buyer);
 					val order = Bridge.buy(mvc, cart);

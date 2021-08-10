@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chinjja.app.domain.Cart;
+import com.chinjja.app.domain.CartProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.service.BaeminService;
 
@@ -29,7 +30,14 @@ public class CartController {
 	}
 	
 	@GetMapping("/{id}")
+	@PreAuthorize("isAuthenticated() and #cart.account.email == principal.username")
 	public Cart one(@PathVariable("id") Cart cart) {
 		return cart;
+	}
+	
+	@GetMapping("/{id}/products")
+	@PreAuthorize("isAuthenticated() and #cart.account.email == principal.username")
+	public Iterable<CartProduct> products(@PathVariable("id") Cart cart) {
+		return baeminService.findCartProducts(cart);
 	}
 }
