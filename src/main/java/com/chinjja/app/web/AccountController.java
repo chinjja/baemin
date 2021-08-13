@@ -1,6 +1,7 @@
 package com.chinjja.app.web;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +30,7 @@ import com.chinjja.app.domain.Seller;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 @RestController
 @RequiredArgsConstructor
@@ -94,8 +96,10 @@ public class AccountController {
 	}
 	
 	@GetMapping("/{id}/cart")
-	public Cart getCart(@PathVariable("id") Account account) {
-		return baeminService.findCart(account);
+	public ResponseEntity<Cart> getCart(@PathVariable("id") Account account) {
+		val cart = baeminService.findCart(account);
+		if(cart == null) return ResponseEntity.noContent().build();
+		return ResponseEntity.ok(cart);
 	}
 	
 	@PutMapping("/{id}/products/{product_id}")

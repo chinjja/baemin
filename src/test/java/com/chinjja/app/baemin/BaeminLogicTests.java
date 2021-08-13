@@ -244,11 +244,9 @@ public class BaeminLogicTests {
 			}
 			
 			@Test
-			void whenTakeCart_thenShouldReturn404() throws Exception {
-				val ex = assertThrows(ResponseStatusException.class, () -> {
-					Bridge.cart(mvc, buyer);
-				});
-				assertThat(ex.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+			void whenTakeCart_thenShouldReturnNull() throws Exception {
+				val cart = Bridge.cart(mvc, buyer);
+				assertThat(cart).isNull();
 			}
 			
 			@Nested
@@ -426,11 +424,9 @@ public class BaeminLogicTests {
 						}
 						
 						@Test
-						void whenTakeCart_thenShouldReturn404() throws Exception {
-							val ex = assertThrows(ResponseStatusException.class, () -> {
-								Bridge.cart(mvc, buyer);
-							});
-							assertThat(ex.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+						void whenTakeCart_thenShouldReturnNull() throws Exception {
+							val cart = Bridge.cart(mvc, buyer);
+							assertThat(cart).isNull();
 						}
 					}
 					
@@ -473,11 +469,9 @@ public class BaeminLogicTests {
 						}
 						
 						@Test
-						void whenTakeCart_thenShouldReturn404() throws Exception {
-							val ex = assertThrows(ResponseStatusException.class, () -> {
-								Bridge.cart(mvc, buyer);
-							});
-							assertThat(ex.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+						void whenTakeCart_thenShouldReturnNull() throws Exception {
+							val cart = Bridge.cart(mvc, buyer);
+							assertThat(cart).isNull();
 						}
 					}
 				}

@@ -14,6 +14,10 @@ public class TestUtils {
 	public static <T> T to(MvcResult result, Class<T> cls) throws Exception {
 		int status = result.getResponse().getStatus();
 		if(status >= 200 && status < 300) {
+			if(status == HttpStatus.NO_CONTENT.value()) {
+				return null;
+			}
+			
 			val res = result.getResponse();
 			return mapper.readValue(res.getContentAsByteArray(), cls);
 		}

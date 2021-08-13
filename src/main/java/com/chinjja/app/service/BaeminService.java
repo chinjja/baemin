@@ -141,7 +141,7 @@ public class BaeminService {
 	
 	public Cart findCart(Account account) {
 		return cartRepository.findByAccountAndOrderIsNull(account)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				.orElse(null);
 	}
 	
 	public Iterable<Order> findOrders(Account account, Status status) {
