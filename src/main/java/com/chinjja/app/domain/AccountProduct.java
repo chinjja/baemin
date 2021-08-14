@@ -5,10 +5,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 
 import com.chinjja.app.account.Account;
 
@@ -24,8 +25,8 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "order_id"}))
-public class Cart {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "product_id"}))
+public class AccountProduct {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -34,6 +35,13 @@ public class Cart {
 	@NotNull
 	private Account account;
 	
-	@OneToOne
-	private Order order;
+	@ManyToOne
+	@NotNull
+	private Product product;
+	
+	@PositiveOrZero
+	private int quantity;
+	
+	@Version
+	private Long version;
 }

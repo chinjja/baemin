@@ -12,17 +12,17 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.chinjja.app.account.Account;
-import com.chinjja.app.domain.Cart;
-import com.chinjja.app.domain.CartProduct;
+import com.chinjja.app.domain.AccountProduct;
 import com.chinjja.app.domain.Order;
+import com.chinjja.app.domain.OrderProduct;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
-import com.chinjja.app.repo.CartProductRepository;
-import com.chinjja.app.repo.CartRepository;
+import com.chinjja.app.repo.AccountProductRepository;
+import com.chinjja.app.repo.OrderProductRepository;
 import com.chinjja.app.repo.OrderRepository;
 import com.chinjja.app.repo.ProductRepository;
 import com.chinjja.app.repo.SellerRepository;
@@ -36,8 +36,8 @@ import lombok.val;
 @Validated
 public class BaeminService {
 	private final ProductRepository productRepository;
-	private final CartRepository cartRepository;
-	private final CartProductRepository cartProductRepository;
+	private final AccountProductRepository accountProductRepository;
+	private final OrderProductRepository orderProductRepository;
 	private final OrderRepository orderRepository;
 	private final SellerRepository sellerRepository;
 	
@@ -87,7 +87,7 @@ public class BaeminService {
 		val info = product.getInfo();
 		val new_quantity = info.getQuantity() + quantity;
 		if(new_quantity < 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot be less than zero");
+			throw new IllegalArgumentException("cannot be less than zero");
 		}
 		info.setQuantity(new_quantity);
 		return productRepository.save(product);
@@ -99,49 +99,36 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	public CartProduct plusQuantity(CartProduct cp, int quantity) {
+	public AccountProduct plusQuantity(AccountProduct cp, int quantity) {
 		if(quantity == 0) {
 			return cp;
 		}
-		if(cp.getCart().getOrder() != null) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot modify quantity after buy");
-		}
 		val new_quantity = cp.getQuantity() + quantity;
 		if(new_quantity < 0) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "cannot be less than zero");
+			throw new IllegalArgumentException("cannot be less than zero");
 		}
 		cp.setQuantity(new_quantity);
-		return cartProductRepository.save(cp);
+		return accountProductRepository.save(cp);
 	}
 	
 	@Transactional
-	public CartProduct minusQuantity(CartProduct cp, int quantity) {
+	public AccountProduct minusQuantity(AccountProduct cp, int quantity) {
 		return plusQuantity(cp, -quantity);
 	}
 	
 	@Transactional
-	public CartProduct addToCart(Cart cart, Product product, int quantity) {
-		val cartProduct = cartProductRepository.findByCartAndProduct(cart, product)
-				.orElseGet(() -> CartProduct.builder()
-						.cart(cart)
-						.product(product)
-						.quantity(0)
-						.build());
-		return plusQuantity(cartProduct, quantity);
-	}
-	
-	@Transactional
-	public CartProduct addToCart(Account account, Product product, int quantity) {
-		val cart = cartRepository.findByAccountAndOrderIsNull(account)
-				.orElseGet(() -> cartRepository.save(Cart.builder()
+	public AccountProduct addToCart(Account account, Product product, int quantity) {
+		val cartProduct = accountProductRepository.findByAccountAndProduct(account, product);
+		if(cartProduct.isPresent()) {
+			return plusQuantity(cartProduct.get(), quantity);
+		}
+		else {
+			return accountProductRepository.save(AccountProduct.builder()
 						.account(account)
-						.build()));
-		return addToCart(cart, product, quantity);
-	}
-	
-	public Cart findCart(Account account) {
-		return cartRepository.findByAccountAndOrderIsNull(account)
-				.orElse(null);
+						.product(product)
+						.quantity(quantity)
+						.build());
+		}
 	}
 	
 	public Iterable<Order> findOrders(Account account, Status status) {
@@ -154,30 +141,37 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	public Order buy(Cart cart) {
-		if(cart.getOrder() != null) {
-			throw new IllegalArgumentException("already bought");
-		}
-		for(val i : cartProductRepository.findAllByCart(cart)) {
-			minusQuantity(i.getProduct(), i.getQuantity());
+	public Order buy(Account account) {
+		val items = accountProductRepository.findAllByAccount(account);
+		if(items.isEmpty()) {
+			throw new IllegalArgumentException("empty cart");
 		}
 		val order = orderRepository.save(Order.builder()
 				.status(Status.IN_PROGRESS)
-				.account(cart.getAccount())
+				.account(account)
 				.createdAt(new Date())
 				.build());
-		cart.setOrder(order);
-		cartRepository.save(cart);
+		for(val i : items) {
+			val product = i.getProduct();
+			val quantity = i.getQuantity();
+			minusQuantity(product, quantity);
+			orderProductRepository.save(OrderProduct.builder()
+					.order(order)
+					.product(product)
+					.quantity(quantity)
+					.build());
+		}
+		accountProductRepository.deleteAll();
 		return order;
 	}
 	
 	@Transactional
 	public Order cancel(Order order) {
 		if(order.getStatus() != Status.IN_PROGRESS) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "when status is in progress you can cancel it");
+			throw new IllegalArgumentException("when status is in progress you can cancel it");
 		}
-		val cart = cartRepository.findByOrder(order).get();
-		for(val i : cartProductRepository.findAllByCart(cart)) {
+		val items = orderProductRepository.findAllByOrder(order);
+		for(val i : items) {
 			plusQuantity(i.getProduct(), i.getQuantity());
 		}
 		order.setStatus(Status.CANCELLED);
@@ -187,13 +181,17 @@ public class BaeminService {
 	@Transactional
 	public Order complete(Order order) {
 		if(order.getStatus() != Status.IN_PROGRESS) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "when status is in progress you can complete it");
+			throw new IllegalArgumentException("when status is in progress you can cancel it");
 		}
 		order.setStatus(Status.COMPLETED);
 		return orderRepository.save(order);
 	}
 	
-	public Iterable<CartProduct> findCartProducts(Cart cart) {
-		return cartProductRepository.findAllByCart(cart);
+	public Iterable<AccountProduct> findCartProducts(Account account) {
+		return accountProductRepository.findAllByAccount(account);
+	}
+	
+	public Iterable<OrderProduct> findOrderProducts(Order order) {
+		return orderProductRepository.findAllByOrder(order);
 	}
 }

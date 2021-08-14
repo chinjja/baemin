@@ -22,15 +22,15 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"cart_id", "product_id"}))
-public class CartProduct {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "product_id"}))
+public class OrderProduct {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne
 	@NotNull
-	private Cart cart;
+	private Order order;
 	
 	@ManyToOne
 	@NotNull

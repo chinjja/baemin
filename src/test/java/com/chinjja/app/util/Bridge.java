@@ -13,8 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
-import com.chinjja.app.domain.Cart;
-import com.chinjja.app.domain.CartProduct;
+import com.chinjja.app.domain.AccountProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
@@ -98,22 +97,22 @@ public class Bridge {
 				.andReturn(), Address[].class);
 	}
 	
-	public static CartProduct add_to_cart(MockMvc mvc, Account account, Product product, int quantity) throws Exception {
+	public static AccountProduct add_to_cart(MockMvc mvc, Account account, Product product, int quantity) throws Exception {
 		return to(mvc.perform(put("/api/accounts/{id}/products/{product_id}", account.getId(), product.getId())
 						.param("quantity", ""+quantity)
 						.accept(MediaType.APPLICATION_JSON))
-				.andReturn(), CartProduct.class);
+				.andReturn(), AccountProduct.class);
 	}
 	
-	public static CartProduct plus_quantity(MockMvc mvc, CartProduct cartProduct, int quantity) throws Exception {
-		return to(mvc.perform(patch("/api/cart-products/{id}/quantity", cartProduct.getId())
+	public static AccountProduct plus_quantity(MockMvc mvc, AccountProduct cartProduct, int quantity) throws Exception {
+		return to(mvc.perform(patch("/api/account-products/{id}/quantity", cartProduct.getId())
 						.param("quantity", ""+quantity)
 						.accept(MediaType.APPLICATION_JSON))
-				.andReturn(), CartProduct.class);
+				.andReturn(), AccountProduct.class);
 	}
 	
-	public static Order buy(MockMvc mvc, Cart cart) throws Exception {
-		return to(mvc.perform(post("/api/carts/{id}/orders", cart.getId())
+	public static Order buy(MockMvc mvc, Account account) throws Exception {
+		return to(mvc.perform(post("/api/accounts/{id}/orders", account.getId())
 						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Order.class);
 	}
@@ -137,16 +136,10 @@ public class Bridge {
 				.andReturn(), Order.class);
 	}
 	
-	public static Cart cart(MockMvc mvc, Account account) throws Exception {
-		return to(mvc.perform(get("/api/accounts/{id}/cart", account.getId())
-						.accept(MediaType.APPLICATION_JSON))
-				.andReturn(), Cart.class);
-	}
-	
-	public static CartProduct[] cartProducts(MockMvc mvc, Cart cart) throws Exception {
-		return to(mvc.perform(get("/api/carts/{id}/products", cart.getId())
+	public static AccountProduct[] products(MockMvc mvc, Account account) throws Exception {
+		return to(mvc.perform(get("/api/accounts/{id}/products", account.getId())
 				.accept(MediaType.APPLICATION_JSON))
-		.andReturn(), CartProduct[].class);
+		.andReturn(), AccountProduct[].class);
 		
 	}
 }

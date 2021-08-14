@@ -20,7 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.dto.AccountCreateDto;
 import com.chinjja.app.account.service.AccountService;
-import com.chinjja.app.domain.CartProduct;
+import com.chinjja.app.domain.AccountProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
@@ -244,15 +244,16 @@ public class BaeminLogicTests {
 			}
 			
 			@Test
+			@WithBuyer
 			void whenTakeCart_thenShouldReturnNull() throws Exception {
-				val cart = Bridge.cart(mvc, buyer);
-				assertThat(cart).isNull();
+				val products = Bridge.products(mvc, buyer);
+				assertThat(products).isEmpty();
 			}
 			
 			@Nested
 			class AddToCart {
-				CartProduct orangeInCart;
-				CartProduct bananaInCart;
+				AccountProduct orangeInCart;
+				AccountProduct bananaInCart;
 				
 				@BeforeEach
 				void setup() {
@@ -263,8 +264,7 @@ public class BaeminLogicTests {
 				@Test
 				@WithBuyer
 				void findAll() throws Exception {
-					val cart = baeminService.findCart(buyer);
-					val list = Bridge.cartProducts(mvc, cart);
+					val list = Bridge.products(mvc, buyer);
 					assertThat(list).hasSize(2).contains(orangeInCart, bananaInCart);
 				}
 				
@@ -279,26 +279,23 @@ public class BaeminLogicTests {
 				@Test
 				@WithBuyer
 				void buy() throws Exception {
-					val cart = baeminService.findCart(buyer);
-					val order = Bridge.buy(mvc, cart);
+					val order = Bridge.buy(mvc, buyer);
 					assertThat(order.getStatus()).isEqualTo(Status.IN_PROGRESS);
 				}
 				
 				@Test
 				@WithSeller
 				void whenBuy_thenShouldThrow403() throws Exception {
-					val cart = baeminService.findCart(buyer);
 					val ex = assertThrows(ResponseStatusException.class, () -> {
-						Bridge.buy(mvc, cart);
+						Bridge.buy(mvc, buyer);
 					});
 					assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
 				}
 				
 				@Test
 				void whenBuy_thenShouldThrow401() throws Exception {
-					val cart = baeminService.findCart(buyer);
 					val ex = assertThrows(ResponseStatusException.class, () -> {
-						Bridge.buy(mvc, cart);
+						Bridge.buy(mvc, buyer);
 					});
 					assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
 				}
@@ -308,13 +305,6 @@ public class BaeminLogicTests {
 				void addToCart() throws Exception {
 					val orangeInCart = Bridge.add_to_cart(mvc, buyer, orange, 5);
 					assertThat(orangeInCart.getQuantity()).isEqualTo(15);
-				}
-				
-				@Test
-				void shouldReturnCart() throws Exception {
-					val cart = Bridge.cart(mvc, buyer);
-					assertThat(cart.getOrder()).isNull();
-					assertThat(cart.getAccount()).isEqualTo(buyer);
 				}
 				
 				@Test
@@ -356,8 +346,7 @@ public class BaeminLogicTests {
 					
 					@BeforeEach
 					void setup() {
-						val cart = baeminService.findCart(buyer);
-						order = baeminService.buy(cart);
+						order = baeminService.buy(buyer);
 					}
 					
 					@Test
@@ -424,9 +413,10 @@ public class BaeminLogicTests {
 						}
 						
 						@Test
+						@WithBuyer
 						void whenTakeCart_thenShouldReturnNull() throws Exception {
-							val cart = Bridge.cart(mvc, buyer);
-							assertThat(cart).isNull();
+							val products = Bridge.products(mvc, buyer);
+							assertThat(products).isEmpty();
 						}
 					}
 					
@@ -469,9 +459,10 @@ public class BaeminLogicTests {
 						}
 						
 						@Test
+						@WithBuyer
 						void whenTakeCart_thenShouldReturnNull() throws Exception {
-							val cart = Bridge.cart(mvc, buyer);
-							assertThat(cart).isNull();
+							val products = Bridge.products(mvc, buyer);
+							assertThat(products).isEmpty();
 						}
 					}
 				}

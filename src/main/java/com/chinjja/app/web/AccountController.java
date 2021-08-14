@@ -1,7 +1,6 @@
 package com.chinjja.app.web;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,17 +19,15 @@ import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
 import com.chinjja.app.account.dto.AddressCreateDto;
 import com.chinjja.app.account.service.AccountService;
-import com.chinjja.app.domain.Cart;
-import com.chinjja.app.domain.CartProduct;
+import com.chinjja.app.domain.AccountProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
-import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
+import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 
 @RestController
 @RequiredArgsConstructor
@@ -95,16 +92,9 @@ public class AccountController {
 		return baeminService.findOrders(account, status);
 	}
 	
-	@GetMapping("/{id}/cart")
-	public ResponseEntity<Cart> getCart(@PathVariable("id") Account account) {
-		val cart = baeminService.findCart(account);
-		if(cart == null) return ResponseEntity.noContent().build();
-		return ResponseEntity.ok(cart);
-	}
-	
 	@PutMapping("/{id}/products/{product_id}")
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
-	public CartProduct addToCart(
+	public AccountProduct addToCart(
 			@PathVariable("id") Account account,
 			@PathVariable("product_id") Product product,
 			@RequestParam(defaultValue = "1") Integer quantity) {
@@ -119,4 +109,16 @@ public class AccountController {
 		return baeminService.createSeller(account, dto);
 	}
 	
+	@PostMapping("/{id}/orders")
+	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
+	public Order buy(@PathVariable("id") Account account) {
+		return baeminService.buy(account);
+	}
+	
+	@GetMapping("/{id}/products")
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
+	public Iterable<AccountProduct> products(@PathVariable("id") Account account) {
+		return baeminService.findCartProducts(account);
+	}
 }
