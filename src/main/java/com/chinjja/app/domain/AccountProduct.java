@@ -12,10 +12,12 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
 import com.chinjja.app.account.Account;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
@@ -43,5 +45,7 @@ public class AccountProduct {
 	private int quantity;
 	
 	@Version
+	@JsonIgnore
+	@EqualsAndHashCode.Exclude
 	private Long version;
 }

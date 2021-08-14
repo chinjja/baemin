@@ -7,12 +7,16 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
@@ -38,4 +42,9 @@ public class OrderProduct {
 	
 	@PositiveOrZero
 	private int quantity;
+	
+	@Version
+	@JsonIgnore
+	@EqualsAndHashCode.Exclude
+	private Long version;
 }

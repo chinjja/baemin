@@ -8,13 +8,16 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 import com.chinjja.app.dto.ProductInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
@@ -36,4 +39,9 @@ public class Product {
 	
 	@Embedded
 	private ProductInfo info;
+	
+	@Version
+	@JsonIgnore
+	@EqualsAndHashCode.Exclude
+	private Long version;
 }
