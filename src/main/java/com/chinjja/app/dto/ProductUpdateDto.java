@@ -21,7 +21,7 @@ public class ProductUpdateDto {
 	BigDecimal price;
 	
 	@PositiveOrZero
-	long quantity;
+	Integer quantity;
 	
 	String title;
 	

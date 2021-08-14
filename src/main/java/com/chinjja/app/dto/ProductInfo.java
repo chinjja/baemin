@@ -24,7 +24,7 @@ public class ProductInfo {
 	
 	@PositiveOrZero
 	@NotNull
-	long quantity;
+	int quantity;
 	
 	@NotBlank
 	String code;

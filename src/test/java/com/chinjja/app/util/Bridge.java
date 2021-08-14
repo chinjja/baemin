@@ -18,6 +18,7 @@ import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
+import com.chinjja.app.dto.AccountProductUpdateDto;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
@@ -70,13 +71,6 @@ public class Bridge {
 				.andReturn(), Product[].class);
 	}
 	
-	public static Product plus_quantity(MockMvc mvc, Product product, int quantity) throws Exception {
-		return to(mvc.perform(patch("/api/products/{id}/quantity", product.getId())
-						.param("quantity", String.valueOf(quantity))
-						.accept(MediaType.APPLICATION_JSON))
-				.andReturn(), Product.class);
-	}
-	
 	public static Account new_account(MockMvc mvc, AccountCreateDto dto) throws Exception {
 		return to(mvc.perform(post("/api/accounts")
 						.accept(MediaType.APPLICATION_JSON)
@@ -104,10 +98,11 @@ public class Bridge {
 				.andReturn(), AccountProduct.class);
 	}
 	
-	public static AccountProduct plus_quantity(MockMvc mvc, AccountProduct cartProduct, int quantity) throws Exception {
-		return to(mvc.perform(patch("/api/account-products/{id}/quantity", cartProduct.getId())
-						.param("quantity", ""+quantity)
-						.accept(MediaType.APPLICATION_JSON))
+	public static AccountProduct update(MockMvc mvc, AccountProduct cartProduct, AccountProductUpdateDto dto) throws Exception {
+		return to(mvc.perform(patch("/api/account-products/{id}", cartProduct.getId())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(toBytes(dto)))
 				.andReturn(), AccountProduct.class);
 	}
 	

@@ -18,6 +18,7 @@ import com.chinjja.app.domain.OrderProduct;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
+import com.chinjja.app.dto.AccountProductUpdateDto;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
@@ -74,7 +75,7 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	public Product updateProduct(Product product, @Valid ProductUpdateDto dto) {
+	public Product update(Product product, @Valid ProductUpdateDto dto) {
 		mapper.map(dto, product.getInfo());
 		return productRepository.save(product);
 	}
@@ -114,6 +115,12 @@ public class BaeminService {
 	@Transactional
 	public AccountProduct minusQuantity(AccountProduct cp, int quantity) {
 		return plusQuantity(cp, -quantity);
+	}
+	
+	@Transactional
+	public AccountProduct update(AccountProduct product, @Valid AccountProductUpdateDto dto) {
+		mapper.map(dto, product);
+		return accountProductRepository.save(product);
 	}
 	
 	@Transactional

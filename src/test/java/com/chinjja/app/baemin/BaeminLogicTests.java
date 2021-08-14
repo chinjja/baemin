@@ -25,6 +25,7 @@ import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
+import com.chinjja.app.dto.AccountProductUpdateDto;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
@@ -186,39 +187,6 @@ public class BaeminLogicTests {
 			}
 			
 			@Test
-			@WithSeller
-			void shouldBeChangedToZero() throws Exception {
-				val orange2 = Bridge.plus_quantity(mvc, orange, -100);
-				assertThat(orange2.getInfo().getQuantity()).isEqualTo(0);
-			}
-			
-			@Test
-			@WithSeller
-			void whenChangedToNegative_thenShouldReturn400() throws Exception {
-				val ex = assertThrows(ResponseStatusException.class, () -> {
-					Bridge.plus_quantity(mvc, orange, -101);
-				});
-				assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-			}
-			
-			@Test
-			void whenChangeQuantity_thenShouldReturn401() throws Exception {
-				val ex = assertThrows(ResponseStatusException.class, () -> {
-					shouldBeChangedToZero();
-				});
-				assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
-			}
-			
-			@Test
-			@WithBuyer
-			void whenChangeQuantity_thenShouldReturn403() throws Exception {
-				val ex = assertThrows(ResponseStatusException.class, () -> {
-					shouldBeChangedToZero();
-				});
-				assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
-			}
-			
-			@Test
 			@WithBuyer
 			void addToCart() throws Exception {
 				val cartProduct = Bridge.add_to_cart(mvc, buyer, orange, 10);
@@ -309,16 +277,18 @@ public class BaeminLogicTests {
 				
 				@Test
 				@WithBuyer
-				void testPlusQuantity() throws Exception {
-					val cartProduct2 = Bridge.plus_quantity(mvc, orangeInCart, 5);
-					assertThat(cartProduct2.getQuantity()).isEqualTo(15);
+				void updateAccountProduct() throws Exception {
+					val updated = Bridge.update(mvc, orangeInCart, AccountProductUpdateDto.builder()
+							.quantity(97)
+							.build());
+					assertThat(updated.getQuantity()).isEqualTo(97);
 				}
 				
 				@Test
 				@WithSeller
 				void shouldThrow403() throws Exception {
 					val ex = assertThrows(ResponseStatusException.class, () -> {
-						testPlusQuantity();
+						updateAccountProduct();
 					});
 					assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
 				}
@@ -326,7 +296,7 @@ public class BaeminLogicTests {
 				@Test
 				void shouldThrow401() throws Exception {
 					val ex = assertThrows(ResponseStatusException.class, () -> {
-						testPlusQuantity();
+						updateAccountProduct();
 					});
 					assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
 				}
@@ -375,7 +345,7 @@ public class BaeminLogicTests {
 					@WithBuyer
 					void whenPlusQuantity_thenShouldReturn400() throws Exception {
 						val ex = assertThrows(ResponseStatusException.class, () -> {
-							Bridge.plus_quantity(mvc, orangeInCart, 5);
+							updateAccountProduct();
 						});
 						assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
 					}
