@@ -7,4 +7,6 @@ spring:
     hibernate:
       ddl-auto: update
     generate-ddl: true
+    open-in-view: false
   jwt.secret: jwt-secret
+  
