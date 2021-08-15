@@ -22,6 +22,9 @@ public class TestUtils {
 				entity = entity.eTag(etag);
 			}
 			if(status == HttpStatus.CREATED.value() || status == HttpStatus.OK.value()) {
+				if(cls == Void.class) {
+					return entity.build();
+				}
 				val body = mapper.readValue(res.getContentAsByteArray(), cls);
 				return entity.body(body);
 			}

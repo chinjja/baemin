@@ -237,6 +237,17 @@ public class BaeminLogicTests {
 				
 				@Test
 				@WithBuyer
+				void testDelete() throws Exception {
+					val res = Bridge.delete(mvc, orangeInCart);
+					assertThat(res.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+					
+					val products = Bridge.products(mvc, buyer);
+					assertThat(products.getStatusCode()).isEqualTo(HttpStatus.OK);
+					assertThat(products.getBody()).hasSize(1).contains(bananaInCart);
+				}
+				
+				@Test
+				@WithBuyer
 				void testEtag() throws Exception {
 					val products = Bridge.products(mvc, buyer);
 					assertThat(products.getStatusCode()).isEqualTo(HttpStatus.OK);

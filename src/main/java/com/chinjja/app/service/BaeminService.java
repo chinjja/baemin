@@ -124,6 +124,11 @@ public class BaeminService {
 	}
 	
 	@Transactional
+	public void delete(AccountProduct entity) {
+		accountProductRepository.delete(entity);
+	}
+	
+	@Transactional
 	public AccountProduct addToCart(Account account, Product product, int quantity) {
 		val cartProduct = accountProductRepository.findByAccountAndProduct(account, product);
 		if(cartProduct.isPresent()) {

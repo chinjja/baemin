@@ -2,6 +2,7 @@ package com.chinjja.app.util;
 
 import static com.chinjja.app.util.TestUtils.to;
 import static com.chinjja.app.util.TestUtils.toBytes;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
@@ -130,6 +132,12 @@ public class Bridge {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(toBytes(dto)))
 				.andReturn(), AccountProduct.class);
+	}
+	
+	public static ResponseEntity<Void> delete(MockMvc mvc, AccountProduct entity) throws Exception {
+		return to(mvc.perform(MockMvcRequestBuilders.delete("/api/account-products/{id}", entity.getId())
+						.accept(MediaType.APPLICATION_JSON))
+				.andReturn(), Void.class);
 	}
 	
 	public static ResponseEntity<Order> buy(MockMvc mvc, Account account) throws Exception {
