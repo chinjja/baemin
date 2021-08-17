@@ -38,6 +38,12 @@ public class Bridge {
 				.andReturn(), Seller.class);
 	}
 	
+	public static ResponseEntity<Seller[]> sellers(MockMvc mvc, Account account) throws Exception {
+		return to(mvc.perform(get("/api/accounts/{id}/sellers", account.getId())
+						.accept(MediaType.APPLICATION_JSON))
+				.andReturn(), Seller[].class);
+	}
+	
 	public static ResponseEntity<Seller> seller(MockMvc mvc, Long id) throws Exception {
 		return to(mvc.perform(get("/api/sellers/{id}", id)
 				.accept(MediaType.APPLICATION_JSON))

@@ -109,6 +109,11 @@ public class AccountController {
 		return baeminService.createSeller(account, dto);
 	}
 	
+	@GetMapping("/{id}/sellers")
+	public Iterable<Seller> sellers(@PathVariable("id") Account account) {
+		return baeminService.findAllSellerByAccount(account);
+	}
+	
 	@PostMapping("/{id}/orders")
 	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")

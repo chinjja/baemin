@@ -92,6 +92,13 @@ public class BaeminLogicTests {
 		}
 		
 		@Test
+		void sellersByAccount() throws Exception {
+			val sellers = Bridge.sellers(mvc, seller_account);
+			assertThat(sellers.getStatusCode()).isEqualTo(HttpStatus.OK);
+			assertThat(sellers.getBody()).hasSize(1).contains(seller);
+		}
+		
+		@Test
 		@WithSeller
 		void createProducts() throws Exception {
 			val orange = Bridge.new_product(mvc, seller, ProductInfo.builder()

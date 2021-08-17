@@ -59,6 +59,10 @@ public class BaeminService {
 		return sellerRepository.findAll();
 	}
 	
+	public Iterable<Seller> findAllSellerByAccount(Account account) {
+		return sellerRepository.findAllByAccount(account);
+	}
+	
 	@Transactional
 	public Product createProduct(Seller seller, @Valid ProductInfo dto) {
 		if(productRepository.findBySellerAndInfoCode(seller, dto.getCode()).isPresent()) {
