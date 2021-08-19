@@ -17,7 +17,7 @@ import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
 import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
-import com.chinjja.app.account.dto.AddressCreateDto;
+import com.chinjja.app.account.dto.AddressInfo;
 import com.chinjja.app.account.service.AccountService;
 import com.chinjja.app.domain.AccountProduct;
 import com.chinjja.app.domain.Order;
@@ -76,7 +76,7 @@ public class AccountController {
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Address createAddress(
 			@PathVariable("id") Account account,
-			@RequestBody AddressCreateDto dto) {
+			@RequestBody AddressInfo dto) {
 		return accountService.addAddress(account, dto);
 	}
 	

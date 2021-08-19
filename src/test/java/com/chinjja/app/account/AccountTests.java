@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.chinjja.app.account.dto.AccountCreateDto;
-import com.chinjja.app.account.dto.AddressCreateDto;
+import com.chinjja.app.account.dto.AddressInfo;
 import com.chinjja.app.util.Bridge;
 
 import lombok.val;
@@ -90,7 +90,7 @@ public class AccountTests {
 	@Test
 	@WithMockUser("root@user.com")
 	void test_address() throws Exception {
-		val dto = AddressCreateDto.builder()
+		val dto = AddressInfo.builder()
 				.city("chang")
 				.street("60-1")
 				.build();
@@ -98,8 +98,8 @@ public class AccountTests {
 		
 		assertThat(address.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		assertEquals(account, address.getBody().getAccount());
-		assertEquals("chang", address.getBody().getCity());
-		assertEquals("60-1", address.getBody().getStreet());
+		assertEquals("chang", address.getBody().getInfo().getCity());
+		assertEquals("60-1", address.getBody().getInfo().getStreet());
 		
 		val addresses = Bridge.addresses(mvc, account);
 		assertThat(addresses.getStatusCode()).isEqualTo(HttpStatus.OK);

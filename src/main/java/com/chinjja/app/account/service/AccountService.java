@@ -17,7 +17,7 @@ import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
 import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
-import com.chinjja.app.account.dto.AddressCreateDto;
+import com.chinjja.app.account.dto.AddressInfo;
 import com.chinjja.app.account.repo.AccountRepository;
 import com.chinjja.app.account.repo.AccountRoleRepository;
 import com.chinjja.app.account.repo.AddressRepository;
@@ -87,9 +87,11 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public Address addAddress(Account account, AddressCreateDto dto) {
-		val addr = mapper.map(dto, Address.class);
-		addr.setAccount(account);
+	public Address addAddress(Account account, @Valid AddressInfo dto) {
+		val addr = Address.builder()
+				.account(account)
+				.info(dto)
+				.build();
 		return addressRepository.save(addr);
 	}
 

@@ -2,19 +2,18 @@ package com.chinjja.app.account.dto;
 
 import javax.validation.constraints.NotBlank;
 
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 import lombok.With;
 
-@Value
-@NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @With
-public class AddressCreateDto {
+public class AddressInfo {
 	@NotBlank
 	private String city;
 	

@@ -18,7 +18,7 @@ import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
 import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
-import com.chinjja.app.account.dto.AddressCreateDto;
+import com.chinjja.app.account.dto.AddressInfo;
 import com.chinjja.app.domain.AccountProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
@@ -119,7 +119,7 @@ public class Bridge {
 				.andReturn(), String[].class);
 	}
 	
-	public static ResponseEntity<Address> new_address(MockMvc mvc, Account account, AddressCreateDto dto) throws Exception {
+	public static ResponseEntity<Address> new_address(MockMvc mvc, Account account, AddressInfo dto) throws Exception {
 		return to(mvc.perform(post("/api/accounts/{id}/addresses", account.getId())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
