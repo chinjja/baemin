@@ -22,6 +22,7 @@ import com.chinjja.app.dto.AccountProductUpdateDto;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
+import com.chinjja.app.dto.SellerUpdateDto;
 import com.chinjja.app.repo.AccountProductRepository;
 import com.chinjja.app.repo.OrderProductRepository;
 import com.chinjja.app.repo.OrderRepository;
@@ -52,6 +53,12 @@ public class BaeminService {
 		val seller = new Seller();
 		seller.setInfo(dto);
 		seller.setAccount(account);
+		return sellerRepository.save(seller);
+	}
+	
+	@Transactional
+	public Seller update(Seller seller, @Valid SellerUpdateDto dto) {
+		mapper.map(dto, seller.getInfo());
 		return sellerRepository.save(seller);
 	}
 	
