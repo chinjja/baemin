@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.ProductInfo;
-import com.chinjja.app.dto.SellerUpdateDto;
+import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
@@ -53,7 +53,7 @@ public class SellerController {
 	@PatchMapping("/{id}")
 	public Seller update(
 			@PathVariable("id") Seller seller,
-			@RequestBody SellerUpdateDto dto) {
+			@RequestBody SellerInfo dto) {
 		return baeminService.update(seller, dto);
 	}
 }

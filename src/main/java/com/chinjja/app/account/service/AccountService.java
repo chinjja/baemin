@@ -88,10 +88,8 @@ public class AccountService {
 	
 	@Transactional
 	public Address addAddress(Account account, @Valid AddressInfo dto) {
-		val addr = Address.builder()
-				.account(account)
-				.info(dto)
-				.build();
+		val addr = mapper.map(dto, Address.class);
+		addr.setAccount(account);
 		return addressRepository.save(addr);
 	}
 

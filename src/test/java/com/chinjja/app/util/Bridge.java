@@ -24,11 +24,9 @@ import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
-import com.chinjja.app.dto.AccountProductUpdateDto;
+import com.chinjja.app.dto.AccountProductInfo;
 import com.chinjja.app.dto.ProductInfo;
-import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
-import com.chinjja.app.dto.SellerUpdateDto;
 
 public class Bridge {
 	public static ResponseEntity<Seller> new_seller(MockMvc mvc, Account account, SellerInfo dto) throws Exception {
@@ -39,7 +37,7 @@ public class Bridge {
 				.andReturn(), Seller.class);
 	}
 	
-	public static ResponseEntity<Seller> update(MockMvc mvc, Seller seller, SellerUpdateDto dto) throws Exception {
+	public static ResponseEntity<Seller> update(MockMvc mvc, Seller seller, SellerInfo dto) throws Exception {
 		return to(mvc.perform(patch("/api/sellers/{id}", seller.getId())
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +76,7 @@ public class Bridge {
 				.andReturn(), Product.class);
 	}
 	
-	public static ResponseEntity<Product> update(MockMvc mvc, Product product, ProductUpdateDto dto) throws Exception {
+	public static ResponseEntity<Product> update(MockMvc mvc, Product product, ProductInfo dto) throws Exception {
 		return to(mvc.perform(patch("/api/products/{id}", product.getId())
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
@@ -141,7 +139,7 @@ public class Bridge {
 				.andReturn(), AccountProduct.class);
 	}
 	
-	public static ResponseEntity<AccountProduct> update(MockMvc mvc, AccountProduct cartProduct, AccountProductUpdateDto dto) throws Exception {
+	public static ResponseEntity<AccountProduct> update(MockMvc mvc, AccountProduct cartProduct, AccountProductInfo dto) throws Exception {
 		return to(mvc.perform(patch("/api/account-products/{id}", cartProduct.getId())
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
