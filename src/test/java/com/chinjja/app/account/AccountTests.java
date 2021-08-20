@@ -98,8 +98,8 @@ public class AccountTests {
 		
 		assertThat(address.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		assertEquals(account, address.getBody().getAccount());
-		assertEquals("chang", address.getBody().getInfo().getCity());
-		assertEquals("60-1", address.getBody().getInfo().getStreet());
+		assertEquals("chang", address.getBody().getCity());
+		assertEquals("60-1", address.getBody().getStreet());
 		
 		val addresses = Bridge.addresses(mvc, account);
 		assertThat(addresses.getStatusCode()).isEqualTo(HttpStatus.OK);
