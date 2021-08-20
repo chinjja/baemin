@@ -107,6 +107,7 @@ public class AccountTests {
 	@WithMockUser("root@user.com")
 	void test_address() throws Exception {
 		val dto = AddressInfo.builder()
+				.name("home")
 				.city("chang")
 				.street("60-1")
 				.build();
@@ -114,6 +115,7 @@ public class AccountTests {
 		
 		assertThat(address.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		assertEquals(account.withPassword(null), address.getBody().getAccount());
+		assertEquals("home", address.getBody().getName());
 		assertEquals("chang", address.getBody().getCity());
 		assertEquals("60-1", address.getBody().getStreet());
 		
@@ -141,10 +143,10 @@ public class AccountTests {
 			val dto = AddressInfo.builder()
 					.city("chang")
 					.build();
-			addr1 = accountService.createAddress(account, dto.withStreet("60-1"));
-			addr2 = accountService.createAddress(account, dto.withStreet("60-2"));
-			addr3 = accountService.createAddress(account, dto.withStreet("60-3"));
-			addr4 = accountService.createAddress(account, dto.withStreet("60-4"));
+			addr1 = accountService.createAddress(account, dto.withName("home").withStreet("60-1"));
+			addr2 = accountService.createAddress(account, dto.withName("park").withStreet("60-2"));
+			addr3 = accountService.createAddress(account, dto.withName("company").withStreet("60-3"));
+			addr4 = accountService.createAddress(account, dto.withName("other").withStreet("60-4"));
 		}
 		
 		@Test

@@ -41,6 +41,9 @@ public class Address {
 	private Long version;
 	
 	@NotBlank
+	private String name;
+	
+	@NotBlank
 	private String city;
 	
 	@NotBlank
