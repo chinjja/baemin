@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 import com.chinjja.app.account.service.AccountService;
 import com.chinjja.app.security.jwt.JwtRequestFilter;
@@ -75,9 +76,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		configuration.addAllowedOrigin("*");
 		configuration.addAllowedMethod("*");
 		configuration.addAllowedHeader("*");
+		configuration.addExposedHeader("etag");
 		configuration.setMaxAge(3600L);
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
+	}
+
+	@Bean
+	public ShallowEtagHeaderFilter shallowEtagHeaderFilter() {
+		return new ShallowEtagHeaderFilter();
 	}
 }

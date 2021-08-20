@@ -1,6 +1,6 @@
 package com.chinjja.app.dto;
 
-import java.math.BigDecimal;
+import javax.validation.constraints.PositiveOrZero;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +13,7 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-public class ProductInfo {
-	private BigDecimal price;
-	private int quantity;
-	private String code;
-	private String title;
-	private String description;
+public class AccountProductInfo {
+	@PositiveOrZero
+	private Integer quantity;
 }

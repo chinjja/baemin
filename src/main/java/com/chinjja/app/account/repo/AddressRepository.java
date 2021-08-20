@@ -9,5 +9,6 @@ import com.chinjja.app.account.Address;
 
 public interface AddressRepository extends CrudRepository<Address, Long> {
 	Iterable<Address> findAllByAccount(Account account);
-	Optional<Address> findByAccountAndMasterIsTrue(Account account);
+	Optional<Address> findTopByAccountAndMasterIsTrue(Account account);
+	Iterable<Address> findByAccountAndMasterIsTrue(Account account);
 }

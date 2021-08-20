@@ -18,15 +18,14 @@ import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
 import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
-import com.chinjja.app.account.dto.AddressCreateDto;
+import com.chinjja.app.account.dto.AddressInfo;
 import com.chinjja.app.account.service.AccountService;
-import com.chinjja.app.domain.Cart;
-import com.chinjja.app.domain.CartProduct;
+import com.chinjja.app.domain.AccountProduct;
 import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
-import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
+import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
@@ -79,13 +78,26 @@ public class AccountController {
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Address createAddress(
 			@PathVariable("id") Account account,
-			@RequestBody AddressCreateDto dto) {
-		return accountService.addAddress(account, dto);
+			@RequestBody AddressInfo dto) {
+		return accountService.createAddress(account, dto);
 	}
 	
 	@GetMapping("/{id}/addresses")
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Iterable<Address> getAddresses(@PathVariable("id") Account account) {
 		return accountService.getAddresses(account);
+	}
+	
+	@GetMapping("/{id}/addresses/master")
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
+	public ResponseEntity<Address> getMasterAddress(@PathVariable("id") Account account) {
+		val address = accountService.getMasterAddress(account);
+		if(address == null) {
+			return ResponseEntity.noContent().build();
+		}
+		else {
+			return ResponseEntity.ok(address);
+		}
 	}
 	
 	@GetMapping("/{id}/orders")
@@ -95,16 +107,9 @@ public class AccountController {
 		return baeminService.findOrders(account, status);
 	}
 	
-	@GetMapping("/{id}/cart")
-	public ResponseEntity<Cart> getCart(@PathVariable("id") Account account) {
-		val cart = baeminService.findCart(account);
-		if(cart == null) return ResponseEntity.noContent().build();
-		return ResponseEntity.ok(cart);
-	}
-	
 	@PutMapping("/{id}/products/{product_id}")
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
-	public CartProduct addToCart(
+	public AccountProduct addToCart(
 			@PathVariable("id") Account account,
 			@PathVariable("product_id") Product product,
 			@RequestParam(defaultValue = "1") Integer quantity) {
@@ -119,4 +124,21 @@ public class AccountController {
 		return baeminService.createSeller(account, dto);
 	}
 	
+	@GetMapping("/{id}/sellers")
+	public Iterable<Seller> sellers(@PathVariable("id") Account account) {
+		return baeminService.findAllSellerByAccount(account);
+	}
+	
+	@PostMapping("/{id}/orders")
+	@ResponseStatus(HttpStatus.CREATED)
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
+	public Order buy(@PathVariable("id") Account account) {
+		return baeminService.buy(account);
+	}
+	
+	@GetMapping("/{id}/products")
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
+	public Iterable<AccountProduct> products(@PathVariable("id") Account account) {
+		return baeminService.findCartProducts(account);
+	}
 }

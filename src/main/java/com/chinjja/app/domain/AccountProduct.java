@@ -7,12 +7,17 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+
+import com.chinjja.app.account.Account;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.With;
 
@@ -22,15 +27,15 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"cart_id", "product_id"}))
-public class CartProduct {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "product_id"}))
+public class AccountProduct {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne
 	@NotNull
-	private Cart cart;
+	private Account account;
 	
 	@ManyToOne
 	@NotNull
@@ -38,4 +43,9 @@ public class CartProduct {
 	
 	@PositiveOrZero
 	private int quantity;
+	
+	@Version
+	@JsonIgnore
+	@EqualsAndHashCode.Exclude
+	private Long version;
 }
