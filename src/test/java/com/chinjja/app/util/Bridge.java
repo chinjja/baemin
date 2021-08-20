@@ -112,7 +112,6 @@ public class Bridge {
 	public static ResponseEntity<String[]> account_roles(MockMvc mvc, Account account) throws Exception {
 		return to(mvc.perform(get("/api/accounts/{id}/roles", account.getId())
 						.accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
 				.andReturn(), String[].class);
 	}
 	
@@ -121,7 +120,6 @@ public class Bridge {
 						.accept(MediaType.APPLICATION_JSON)
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(toBytes(dto)))
-				.andExpect(status().isCreated())
 				.andReturn(), Address.class);
 	}
 	

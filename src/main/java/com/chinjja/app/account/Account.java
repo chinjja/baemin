@@ -39,6 +39,7 @@ public class Account {
 	@NotNull
 	@JsonIgnore
 	@ToString.Exclude
+	@EqualsAndHashCode.Exclude
 	private String password;
 	
 	@NotBlank
