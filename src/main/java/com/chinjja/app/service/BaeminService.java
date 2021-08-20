@@ -18,7 +18,7 @@ import com.chinjja.app.domain.OrderProduct;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
-import com.chinjja.app.dto.AccountProductUpdateDto;
+import com.chinjja.app.dto.AccountProductInfo;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.repo.AccountProductRepository;
@@ -124,7 +124,7 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	public AccountProduct update(AccountProduct product, @Valid AccountProductUpdateDto dto) {
+	public AccountProduct update(AccountProduct product, @Valid AccountProductInfo dto) {
 		mapper.map(dto, product);
 		return accountProductRepository.save(product);
 	}

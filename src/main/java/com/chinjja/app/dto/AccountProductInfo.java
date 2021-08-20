@@ -13,7 +13,7 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-public class AccountProductUpdateDto {
+public class AccountProductInfo {
 	@PositiveOrZero
 	private Integer quantity;
 }

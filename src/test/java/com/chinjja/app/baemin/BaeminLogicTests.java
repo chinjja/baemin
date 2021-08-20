@@ -27,7 +27,7 @@ import com.chinjja.app.domain.Order;
 import com.chinjja.app.domain.Order.Status;
 import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
-import com.chinjja.app.dto.AccountProductUpdateDto;
+import com.chinjja.app.dto.AccountProductInfo;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.service.BaeminService;
@@ -288,7 +288,7 @@ public class BaeminLogicTests {
 							.header("If-None-Match", etag))
 							.andExpect(status().isNotModified());
 					
-					Bridge.update(mvc, orangeInCart, AccountProductUpdateDto.builder()
+					Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
 							.quantity(90)
 							.build());
 					
@@ -344,7 +344,7 @@ public class BaeminLogicTests {
 				@Test
 				@WithBuyer
 				void updateAccountProduct() throws Exception {
-					val updated = Bridge.update(mvc, orangeInCart, AccountProductUpdateDto.builder()
+					val updated = Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
 							.quantity(97)
 							.build());
 					assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -354,7 +354,7 @@ public class BaeminLogicTests {
 				@Test
 				@WithSeller
 				void shouldThrow403() throws Exception {
-					val updated = Bridge.update(mvc, orangeInCart, AccountProductUpdateDto.builder()
+					val updated = Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
 							.quantity(97)
 							.build());
 					assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -362,7 +362,7 @@ public class BaeminLogicTests {
 				
 				@Test
 				void shouldThrow401() throws Exception {
-					val updated = Bridge.update(mvc, orangeInCart, AccountProductUpdateDto.builder()
+					val updated = Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
 							.quantity(97)
 							.build());
 					assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -417,7 +417,7 @@ public class BaeminLogicTests {
 					@Test
 					@WithBuyer
 					void whenPlusQuantity_thenShouldReturn400() throws Exception {
-						val updated = Bridge.update(mvc, orangeInCart, AccountProductUpdateDto.builder()
+						val updated = Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
 								.quantity(97)
 								.build());
 						assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);

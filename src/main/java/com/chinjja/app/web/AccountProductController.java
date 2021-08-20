@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chinjja.app.domain.AccountProduct;
-import com.chinjja.app.dto.AccountProductUpdateDto;
+import com.chinjja.app.dto.AccountProductInfo;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class AccountProductController {
 	@PreAuthorize("isAuthenticated() and #product.account.email == principal.username")
 	public AccountProduct patch(
 			@PathVariable(name = "id", required = false) AccountProduct product,
-			@RequestBody AccountProductUpdateDto dto) {
+			@RequestBody AccountProductInfo dto) {
 		if(product == null) {
 			throw new IllegalArgumentException("id not found");
 		}
