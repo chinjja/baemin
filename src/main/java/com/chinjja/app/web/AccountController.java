@@ -1,6 +1,7 @@
 package com.chinjja.app.web;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 
 @RestController
 @RequiredArgsConstructor
@@ -77,12 +79,25 @@ public class AccountController {
 	public Address createAddress(
 			@PathVariable("id") Account account,
 			@RequestBody AddressInfo dto) {
-		return accountService.addAddress(account, dto);
+		return accountService.createAddress(account, dto);
 	}
 	
 	@GetMapping("/{id}/addresses")
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
 	public Iterable<Address> getAddresses(@PathVariable("id") Account account) {
 		return accountService.getAddresses(account);
+	}
+	
+	@GetMapping("/{id}/addresses/master")
+	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
+	public ResponseEntity<Address> getMasterAddress(@PathVariable("id") Account account) {
+		val address = accountService.getMasterAddress(account);
+		if(address == null) {
+			return ResponseEntity.noContent().build();
+		}
+		else {
+			return ResponseEntity.ok(address);
+		}
 	}
 	
 	@GetMapping("/{id}/orders")

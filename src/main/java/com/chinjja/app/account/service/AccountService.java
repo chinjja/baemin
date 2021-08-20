@@ -87,10 +87,24 @@ public class AccountService {
 	}
 	
 	@Transactional
-	public Address addAddress(Account account, @Valid AddressInfo dto) {
+	public Address createAddress(Account account, @Valid AddressInfo dto) {
 		val addr = mapper.map(dto, Address.class);
 		addr.setAccount(account);
 		return addressRepository.save(addr);
+	}
+	
+	@Transactional
+	public Address updateAddress(Address address, @Valid AddressInfo dto) {
+		val master = dto.isMaster();
+		if(master) {
+			val masters = addressRepository.findByAccountAndMasterIsTrue(address.getAccount());
+			for(val i : masters) {
+				i.setMaster(false);
+			}
+			addressRepository.saveAll(masters);
+		}
+		mapper.map(dto, address);
+		return addressRepository.save(address);
 	}
 
 	@Transactional
@@ -105,9 +119,13 @@ public class AccountService {
 		return addressRepository.findAllByAccount(account);
 	}
 	
+	public Address getMasterAddress(Account account) {
+		return addressRepository.findTopByAccountAndMasterIsTrue(account).orElse(null);
+	}
+	
 	@Transactional
 	public Address setPrimary(Address address) {
-		addressRepository.findByAccountAndMasterIsTrue(address.getAccount())
+		addressRepository.findTopByAccountAndMasterIsTrue(address.getAccount())
 		.ifPresent(x -> {
 			x.setMaster(false);
 			addressRepository.save(x);

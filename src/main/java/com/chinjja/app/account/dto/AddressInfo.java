@@ -12,6 +12,7 @@ import lombok.With;
 @Builder
 @With
 public class AddressInfo {
+	private boolean master;
 	private String city;
 	private String street;
 }

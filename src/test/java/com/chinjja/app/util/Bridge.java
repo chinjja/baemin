@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -126,10 +125,24 @@ public class Bridge {
 				.andReturn(), Address.class);
 	}
 	
+	public static ResponseEntity<Address> update_address(MockMvc mvc, Address address, AddressInfo dto) throws Exception {
+		return to(mvc.perform(patch("/api/addresses/{id}", address.getId())
+						.accept(MediaType.APPLICATION_JSON)
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(toBytes(dto)))
+				.andReturn(), Address.class);
+	}
+	
 	public static ResponseEntity<Address[]> addresses(MockMvc mvc, Account account) throws Exception {
 		return to(mvc.perform(get("/api/accounts/{id}/addresses", account.getId())
 						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Address[].class);
+	}
+	
+	public static ResponseEntity<Address> master_address(MockMvc mvc, Account account) throws Exception {
+		return to(mvc.perform(get("/api/accounts/{id}/addresses/master", account.getId())
+						.accept(MediaType.APPLICATION_JSON))
+				.andReturn(), Address.class);
 	}
 	
 	public static ResponseEntity<AccountProduct> add_to_cart(MockMvc mvc, Account account, Product product, int quantity) throws Exception {
