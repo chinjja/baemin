@@ -27,7 +27,6 @@ import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.AccountProductUpdateDto;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.SellerInfo;
-import com.chinjja.app.dto.SellerUpdateDto;
 
 public class Bridge {
 	public static ResponseEntity<Seller> new_seller(MockMvc mvc, Account account, SellerInfo dto) throws Exception {
@@ -38,7 +37,7 @@ public class Bridge {
 				.andReturn(), Seller.class);
 	}
 	
-	public static ResponseEntity<Seller> update(MockMvc mvc, Seller seller, SellerUpdateDto dto) throws Exception {
+	public static ResponseEntity<Seller> update(MockMvc mvc, Seller seller, SellerInfo dto) throws Exception {
 		return to(mvc.perform(patch("/api/sellers/{id}", seller.getId())
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)

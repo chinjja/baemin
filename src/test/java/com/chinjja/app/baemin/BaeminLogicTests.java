@@ -30,7 +30,6 @@ import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.AccountProductUpdateDto;
 import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.dto.SellerInfo;
-import com.chinjja.app.dto.SellerUpdateDto;
 import com.chinjja.app.service.BaeminService;
 import com.chinjja.app.util.Bridge;
 
@@ -80,19 +79,20 @@ public class BaeminLogicTests {
 		
 		@Test
 		void updateSeller() throws Exception {
-			val updated = Bridge.update(mvc, seller, SellerUpdateDto.builder()
+			val updated = Bridge.update(mvc, seller, SellerInfo.builder()
 					.name("Updated")
 					.build());
 			
 			assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.OK);
-			assertThat(updated.getBody().getInfo()).isEqualTo(seller.getInfo().withName("Updated"));
+			assertEquals("Updated", updated.getBody().getName());
 			
-			val updated2 = Bridge.update(mvc, seller, SellerUpdateDto.builder()
+			val updated2 = Bridge.update(mvc, seller, SellerInfo.builder()
 					.description("UpdatedDesc")
 					.build());
 			
 			assertThat(updated2.getStatusCode()).isEqualTo(HttpStatus.OK);
-			assertThat(updated2.getBody().getInfo()).isEqualTo(seller.getInfo().withName("Updated").withDescription("UpdatedDesc"));
+			assertEquals("Updated", updated2.getBody().getName());
+			assertEquals("UpdatedDesc", updated2.getBody().getDescription());
 		}
 		
 		@Test
