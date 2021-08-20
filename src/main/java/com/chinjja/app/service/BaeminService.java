@@ -20,7 +20,6 @@ import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.AccountProductUpdateDto;
 import com.chinjja.app.dto.ProductInfo;
-import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.dto.SellerUpdateDto;
 import com.chinjja.app.repo.AccountProductRepository;
@@ -72,11 +71,10 @@ public class BaeminService {
 	
 	@Transactional
 	public Product createProduct(Seller seller, @Valid ProductInfo dto) {
-		if(productRepository.findBySellerAndInfoCode(seller, dto.getCode()).isPresent()) {
+		if(productRepository.findBySellerAndCode(seller, dto.getCode()).isPresent()) {
 			throw new ResponseStatusException(HttpStatus.CONFLICT, "seller or code is conflict");
 		}
-		val product = new Product();
-		product.setInfo(dto);
+		val product = mapper.map(dto, Product.class);
 		product.setSeller(seller);
 		return productRepository.save(product);
 	}
@@ -86,8 +84,8 @@ public class BaeminService {
 	}
 	
 	@Transactional
-	public Product update(Product product, @Valid ProductUpdateDto dto) {
-		mapper.map(dto, product.getInfo());
+	public Product update(Product product, @Valid ProductInfo dto) {
+		mapper.map(dto, product);
 		return productRepository.save(product);
 	}
 	
@@ -96,12 +94,11 @@ public class BaeminService {
 		if(quantity == 0) {
 			return product;
 		}
-		val info = product.getInfo();
-		val new_quantity = info.getQuantity() + quantity;
+		val new_quantity = product.getQuantity() + quantity;
 		if(new_quantity < 0) {
 			throw new IllegalArgumentException("cannot be less than zero");
 		}
-		info.setQuantity(new_quantity);
+		product.setQuantity(new_quantity);
 		return productRepository.save(product);
 	}
 	

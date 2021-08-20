@@ -1,6 +1,7 @@
 package com.chinjja.app.domain;
 
-import javax.persistence.Embedded;
+import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,9 +10,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 
-import com.chinjja.app.dto.ProductInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -37,11 +39,25 @@ public class Product {
 	@NotNull
 	private Seller seller;
 	
-	@Embedded
-	private ProductInfo info;
-	
 	@Version
 	@JsonIgnore
 	@EqualsAndHashCode.Exclude
 	private Long version;
+	
+	@PositiveOrZero
+	@NotNull
+	private BigDecimal price;
+	
+	@PositiveOrZero
+	@NotNull
+	private int quantity;
+	
+	@NotBlank
+	private String code;
+	
+	@NotBlank
+	private String title;
+	
+	@NotBlank
+	private String description;
 }

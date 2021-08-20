@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.chinjja.app.domain.Product;
-import com.chinjja.app.dto.ProductUpdateDto;
+import com.chinjja.app.dto.ProductInfo;
 import com.chinjja.app.service.BaeminService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class ProductController {
 	@PreAuthorize("isAuthenticated() and #product.seller.account.email == principal.username")
 	public Product patch(
 			@PathVariable("id") Product product,
-			@RequestBody ProductUpdateDto dto) {
+			@RequestBody ProductInfo dto) {
 		return baeminService.update(product, dto);
 	}
 }

@@ -26,7 +26,6 @@ import com.chinjja.app.domain.Product;
 import com.chinjja.app.domain.Seller;
 import com.chinjja.app.dto.AccountProductUpdateDto;
 import com.chinjja.app.dto.ProductInfo;
-import com.chinjja.app.dto.ProductUpdateDto;
 import com.chinjja.app.dto.SellerInfo;
 import com.chinjja.app.dto.SellerUpdateDto;
 
@@ -78,7 +77,7 @@ public class Bridge {
 				.andReturn(), Product.class);
 	}
 	
-	public static ResponseEntity<Product> update(MockMvc mvc, Product product, ProductUpdateDto dto) throws Exception {
+	public static ResponseEntity<Product> update(MockMvc mvc, Product product, ProductInfo dto) throws Exception {
 		return to(mvc.perform(patch("/api/products/{id}", product.getId())
 				.accept(MediaType.APPLICATION_JSON)
 				.contentType(MediaType.APPLICATION_JSON)
