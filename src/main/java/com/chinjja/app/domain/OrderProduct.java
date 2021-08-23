@@ -11,6 +11,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
+import com.chinjja.app.etag.Etag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ import lombok.With;
 @Builder
 @With
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"order_id", "product_id"}))
-public class OrderProduct {
+public class OrderProduct implements Etag {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

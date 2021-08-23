@@ -36,9 +36,10 @@ public class Bridge {
 				.andReturn(), Seller.class);
 	}
 	
-	public static ResponseEntity<Seller> update(MockMvc mvc, Seller seller, SellerInfo dto) throws Exception {
-		return to(mvc.perform(patch("/api/sellers/{id}", seller.getId())
+	public static ResponseEntity<Seller> update(MockMvc mvc, ResponseEntity<Seller> seller, SellerInfo dto) throws Exception {
+		return to(mvc.perform(patch("/api/sellers/{id}", seller.getBody().getId())
 				.accept(MediaType.APPLICATION_JSON)
+				.header("If-Match", seller.getHeaders().getETag())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(toBytes(dto)))
 		.andReturn(), Seller.class);
@@ -50,8 +51,8 @@ public class Bridge {
 				.andReturn(), Seller[].class);
 	}
 	
-	public static ResponseEntity<Seller> seller(MockMvc mvc, Long id) throws Exception {
-		return to(mvc.perform(get("/api/sellers/{id}", id)
+	public static ResponseEntity<Seller> seller(MockMvc mvc, Seller seller) throws Exception {
+		return to(mvc.perform(get("/api/sellers/{id}", seller.getId())
 				.accept(MediaType.APPLICATION_JSON))
 		.andReturn(), Seller.class);
 	}
@@ -69,15 +70,16 @@ public class Bridge {
 						.content(toBytes(dto)))
 				.andReturn(), Product.class);
 	}
-	public static ResponseEntity<Product> product(MockMvc mvc, Long id) throws Exception {
-		return to(mvc.perform(get("/api/products/{id}", id)
+	public static ResponseEntity<Product> product(MockMvc mvc, Product product) throws Exception {
+		return to(mvc.perform(get("/api/products/{id}", product.getId())
 						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Product.class);
 	}
 	
-	public static ResponseEntity<Product> update(MockMvc mvc, Product product, ProductInfo dto) throws Exception {
-		return to(mvc.perform(patch("/api/products/{id}", product.getId())
+	public static ResponseEntity<Product> update(MockMvc mvc, ResponseEntity<Product> product, ProductInfo dto) throws Exception {
+		return to(mvc.perform(patch("/api/products/{id}", product.getBody().getId())
 				.accept(MediaType.APPLICATION_JSON)
+				.header("If-Match", product.getHeaders().getETag())
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(toBytes(dto)))
 		.andReturn(), Product.class);
@@ -97,8 +99,8 @@ public class Bridge {
 				.andReturn(), Account.class);
 	}
 	
-	public static ResponseEntity<Account> account(MockMvc mvc, long id) throws Exception {
-		return to(mvc.perform(get("/api/accounts/{id}", id)
+	public static ResponseEntity<Account> account(MockMvc mvc, Account account) throws Exception {
+		return to(mvc.perform(get("/api/accounts/{id}", account.getId())
 						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Account.class);
 	}
@@ -123,11 +125,18 @@ public class Bridge {
 				.andReturn(), Address.class);
 	}
 	
-	public static ResponseEntity<Address> update_address(MockMvc mvc, Address address, AddressInfo dto) throws Exception {
-		return to(mvc.perform(patch("/api/addresses/{id}", address.getId())
+	public static ResponseEntity<Address> update_address(MockMvc mvc, ResponseEntity<Address> address, AddressInfo dto) throws Exception {
+		return to(mvc.perform(patch("/api/addresses/{id}", address.getBody().getId())
 						.accept(MediaType.APPLICATION_JSON)
+						.header("If-Match", address.getHeaders().getETag())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(toBytes(dto)))
+				.andReturn(), Address.class);
+	}
+	
+	public static ResponseEntity<Address> address(MockMvc mvc, Address address) throws Exception {
+		return to(mvc.perform(get("/api/adresses/{id}", address.getId())
+						.accept(MediaType.APPLICATION_JSON))
 				.andReturn(), Address.class);
 	}
 	
@@ -150,9 +159,16 @@ public class Bridge {
 				.andReturn(), AccountProduct.class);
 	}
 	
-	public static ResponseEntity<AccountProduct> update(MockMvc mvc, AccountProduct cartProduct, AccountProductInfo dto) throws Exception {
-		return to(mvc.perform(patch("/api/account-products/{id}", cartProduct.getId())
+	public static ResponseEntity<AccountProduct> account_product(MockMvc mvc, AccountProduct entity) throws Exception {
+		return to(mvc.perform(get("/api/account-products/{id}", entity.getId())
+						.accept(MediaType.APPLICATION_JSON))
+				.andReturn(), AccountProduct.class);
+	}
+	
+	public static ResponseEntity<AccountProduct> update(MockMvc mvc, ResponseEntity<AccountProduct> cartProduct, AccountProductInfo dto) throws Exception {
+		return to(mvc.perform(patch("/api/account-products/{id}", cartProduct.getBody().getId())
 						.accept(MediaType.APPLICATION_JSON)
+						.header("If-Match", cartProduct.getHeaders().getETag())
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(toBytes(dto)))
 				.andReturn(), AccountProduct.class);
@@ -170,6 +186,12 @@ public class Bridge {
 				.andReturn(), Order.class);
 	}
 	
+	public static ResponseEntity<Order> order(MockMvc mvc, Order order) throws Exception {
+		return to(mvc.perform(get("/api/orders/{id}", order.getId())
+						.accept(MediaType.APPLICATION_JSON))
+				.andReturn(), Order.class);
+	}
+	
 	public static ResponseEntity<Order[]> orders(MockMvc mvc, Account account, Status status) throws Exception {
 		return to(mvc.perform(get("/api/accounts/{id}/orders", account.getId())
 					.param("status", status == null ? null : status.toString())
@@ -177,15 +199,17 @@ public class Bridge {
 				.andReturn(), Order[].class);
 	}
 	
-	public static ResponseEntity<Order> cancel(MockMvc mvc, Order order) throws Exception {
-		return to(mvc.perform(patch("/api/orders/{id}/cancel", order.getId())
-						.accept(MediaType.APPLICATION_JSON))
+	public static ResponseEntity<Order> cancel(MockMvc mvc, ResponseEntity<Order> order) throws Exception {
+		return to(mvc.perform(patch("/api/orders/{id}/cancel", order.getBody().getId())
+						.accept(MediaType.APPLICATION_JSON)
+						.header("If-Match", order.getHeaders().getETag()))
 				.andReturn(), Order.class);
 	}
 	
-	public static ResponseEntity<Order> complete(MockMvc mvc, Order order) throws Exception {
-		return to(mvc.perform(patch("/api/orders/{id}/complete", order.getId())
-						.accept(MediaType.APPLICATION_JSON))
+	public static ResponseEntity<Order> complete(MockMvc mvc, ResponseEntity<Order> order) throws Exception {
+		return to(mvc.perform(patch("/api/orders/{id}/complete", order.getBody().getId())
+						.accept(MediaType.APPLICATION_JSON)
+						.header("If-Match", order.getHeaders().getETag()))
 				.andReturn(), Order.class);
 	}
 	

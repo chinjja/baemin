@@ -1,10 +1,13 @@
 package com.chinjja.app.web;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -13,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 
 import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
 import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
+import com.chinjja.app.account.dto.AccountInfo;
 import com.chinjja.app.account.dto.AddressInfo;
 import com.chinjja.app.account.service.AccountService;
 import com.chinjja.app.domain.AccountProduct;
@@ -39,23 +44,45 @@ public class AccountController {
 	private final BaeminService baeminService;
 	
 	@GetMapping("/{id}")
-	public Account one(@PathVariable("id") Account account) {
-		return account;
+	public ResponseEntity<Account> one(@PathVariable(name = "id", required = false) Account account) {
+		if(account == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok().eTag(account.etag()).body(account);
 	}
 	
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public Account create(@RequestBody AccountCreateDto dto) {
-		return accountService.create(dto);
+	public ResponseEntity<Account> create(@RequestBody AccountCreateDto dto) {
+		val account = accountService.create(dto);
+		return ResponseEntity.created(null).eTag(account.etag()).body(account);
+	}
+	
+	@PatchMapping("/{id}")
+	public ResponseEntity<Account> patch(
+			WebRequest request,
+			@PathVariable(name = "id", required = false) Account account,
+			@RequestBody AccountInfo dto) {
+		if(account == null) {
+			return ResponseEntity.notFound().build();
+		}
+		val etag = request.getHeader(HttpHeaders.IF_MATCH);
+		if(!StringUtils.hasText(etag)) {
+			return ResponseEntity.badRequest().build();
+		}
+		if(!etag.equals(account.etag())) {
+			return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+		}
+		val updated = accountService.update(account, dto);
+		return ResponseEntity.ok().eTag(updated.etag()).body(updated);
 	}
 	
 	@PostMapping("/{id}/roles/{role}")
-	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("hasRole('ADMIN')")
-	public AccountRole addRole(
+	public ResponseEntity<AccountRole> addRole(
 			@PathVariable("id") Account account,
 			@PathVariable String role) {
-		return accountService.addRole(account, role);
+		val new_role = accountService.addRole(account, role);
+		return ResponseEntity.created(null).eTag(new_role.etag()).body(new_role);
 	}
 	
 	@DeleteMapping("/{id}/roles/{role}")
@@ -74,12 +101,12 @@ public class AccountController {
 	}
 	
 	@PostMapping("/{id}/addresses")
-	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
-	public Address createAddress(
+	public ResponseEntity<Address> createAddress(
 			@PathVariable("id") Account account,
 			@RequestBody AddressInfo dto) {
-		return accountService.createAddress(account, dto);
+		val address = accountService.createAddress(account, dto);
+		return ResponseEntity.created(null).eTag(address.etag()).body(address);
 	}
 	
 	@GetMapping("/{id}/addresses")
@@ -96,7 +123,7 @@ public class AccountController {
 			return ResponseEntity.noContent().build();
 		}
 		else {
-			return ResponseEntity.ok(address);
+			return ResponseEntity.ok().eTag(address.etag()).body(address);
 		}
 	}
 	
@@ -109,19 +136,21 @@ public class AccountController {
 	
 	@PutMapping("/{id}/products/{product_id}")
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
-	public AccountProduct addToCart(
+	public ResponseEntity<AccountProduct> addToCart(
 			@PathVariable("id") Account account,
 			@PathVariable("product_id") Product product,
 			@RequestParam(defaultValue = "1") Integer quantity) {
-		return baeminService.addToCart(account, product, quantity);
+		val entity = baeminService.addToCart(account, product, quantity);
+		return ResponseEntity.ok().eTag(entity.etag()).body(entity);
 	}
 	
 	@PostMapping("/{id}/sellers")
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
-	public Seller createSeller(
+	public ResponseEntity<Seller> createSeller(
 			@PathVariable("id") Account account,
 			@RequestBody SellerInfo dto) {
-		return baeminService.createSeller(account, dto);
+		val seller = baeminService.createSeller(account, dto);
+		return ResponseEntity.created(null).eTag(seller.etag()).body(seller);
 	}
 	
 	@GetMapping("/{id}/sellers")
@@ -130,10 +159,10 @@ public class AccountController {
 	}
 	
 	@PostMapping("/{id}/orders")
-	@ResponseStatus(HttpStatus.CREATED)
 	@PreAuthorize("isAuthenticated() and #account.email == principal.username")
-	public Order buy(@PathVariable("id") Account account) {
-		return baeminService.buy(account);
+	public ResponseEntity<Order> buy(@PathVariable("id") Account account) {
+		val order = baeminService.buy(account);
+		return ResponseEntity.created(null).eTag(order.etag()).body(order);
 	}
 	
 	@GetMapping("/{id}/products")

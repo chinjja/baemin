@@ -13,6 +13,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 import com.chinjja.app.account.Account;
+import com.chinjja.app.etag.Etag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-public class Order {
+public class Order implements Etag {
 	public enum Status {
 		CART,
 		IN_PROGRESS,

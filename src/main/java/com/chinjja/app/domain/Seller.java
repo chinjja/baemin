@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.chinjja.app.account.Account;
+import com.chinjja.app.etag.Etag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +26,7 @@ import lombok.With;
 @AllArgsConstructor
 @Builder
 @With
-public class Seller {
+public class Seller implements Etag {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

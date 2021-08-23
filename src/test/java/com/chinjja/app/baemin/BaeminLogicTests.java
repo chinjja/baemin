@@ -79,14 +79,15 @@ public class BaeminLogicTests {
 		
 		@Test
 		void updateSeller() throws Exception {
-			val updated = Bridge.update(mvc, seller, SellerInfo.builder()
+			val get = Bridge.seller(mvc, seller);
+			val updated = Bridge.update(mvc, get, SellerInfo.builder()
 					.name("Updated")
 					.build());
 			
 			assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.OK);
 			assertEquals("Updated", updated.getBody().getName());
 			
-			val updated2 = Bridge.update(mvc, seller, SellerInfo.builder()
+			val updated2 = Bridge.update(mvc, updated, SellerInfo.builder()
 					.description("UpdatedDesc")
 					.build());
 			
@@ -97,7 +98,7 @@ public class BaeminLogicTests {
 		
 		@Test
 		void seller() throws Exception {
-			val one = Bridge.seller(mvc, seller.getId());
+			val one = Bridge.seller(mvc, seller);
 			assertThat(one.getStatusCode()).isEqualTo(HttpStatus.OK);
 			assertThat(one.getBody()).isEqualTo(seller);
 		}
@@ -175,6 +176,20 @@ public class BaeminLogicTests {
 			
 			@Test
 			@WithSeller
+			void testEtag() throws Exception {
+				val res1 = Bridge.product(mvc, orange);
+				assertThat(res1.getStatusCode()).isEqualTo(HttpStatus.OK);
+				val etag = res1.getHeaders().getETag();
+				assertThat(etag).isNotNull();
+				
+				val res2 = Bridge.update(mvc, res1, ProductInfo.builder()
+						.description("hello world!")
+						.build());
+				assertThat(res2.getStatusCode()).isEqualTo(HttpStatus.OK);
+			}
+			
+			@Test
+			@WithSeller
 			void conflictProducts() throws Exception {
 				val copy = Bridge.new_product(mvc, seller, ProductInfo.builder()
 						.code("ORANGE")
@@ -189,26 +204,28 @@ public class BaeminLogicTests {
 			@Test
 			@WithSeller
 			void whenUpdateProduct_thenShouldSuccess() throws Exception {
-				val desc_change = Bridge.update(mvc, orange, ProductInfo.builder()
+				val get = Bridge.product(mvc, orange);
+				val upd1 = Bridge.update(mvc, get, ProductInfo.builder()
 						.description("this is not orange")
 						.build());
 				
-				assertThat(desc_change.getStatusCode()).isEqualTo(HttpStatus.OK);
+				assertThat(upd1.getStatusCode()).isEqualTo(HttpStatus.OK);
 				assertEquals("this is not orange", orange.getDescription());
 				
-				val price_change = Bridge.update(mvc, orange, ProductInfo.builder()
+				val upd2 = Bridge.update(mvc, upd1, ProductInfo.builder()
 						.price(new BigDecimal("100000"))
 						.quantity(9999)
 						.build());
 				
-				assertThat(price_change.getStatusCode()).isEqualTo(HttpStatus.OK);
+				assertThat(upd2.getStatusCode()).isEqualTo(HttpStatus.OK);
 				assertEquals(new BigDecimal("100000"), orange.getPrice());
 				assertEquals(9999, orange.getQuantity());
 			}
 			
 			@Test
 			void whenUpdateProduct_thenShouldThrow401() throws Exception {
-				val updated = Bridge.update(mvc, orange, ProductInfo.builder()
+				val get = Bridge.product(mvc, orange);
+				val updated = Bridge.update(mvc, get, ProductInfo.builder()
 						.description("this is not orange")
 						.build());
 				assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -217,7 +234,8 @@ public class BaeminLogicTests {
 			@Test
 			@WithBuyer
 			void whenUpdateProduct_thenShouldThrow403() throws Exception {
-				val updated = Bridge.update(mvc, orange, ProductInfo.builder()
+				val get = Bridge.product(mvc, orange);
+				val updated = Bridge.update(mvc, get, ProductInfo.builder()
 						.description("this is not orange")
 						.build());
 				assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -288,7 +306,8 @@ public class BaeminLogicTests {
 							.header("If-None-Match", etag))
 							.andExpect(status().isNotModified());
 					
-					Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
+					val get = Bridge.account_product(mvc, orangeInCart);
+					Bridge.update(mvc, get, AccountProductInfo.builder()
 							.quantity(90)
 							.build());
 					
@@ -344,7 +363,8 @@ public class BaeminLogicTests {
 				@Test
 				@WithBuyer
 				void updateAccountProduct() throws Exception {
-					val updated = Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
+					val get = Bridge.account_product(mvc, orangeInCart);
+					val updated = Bridge.update(mvc, get, AccountProductInfo.builder()
 							.quantity(97)
 							.build());
 					assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -354,7 +374,8 @@ public class BaeminLogicTests {
 				@Test
 				@WithSeller
 				void shouldThrow403() throws Exception {
-					val updated = Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
+					val get = Bridge.account_product(mvc, orangeInCart);
+					val updated = Bridge.update(mvc, get, AccountProductInfo.builder()
 							.quantity(97)
 							.build());
 					assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -362,7 +383,8 @@ public class BaeminLogicTests {
 				
 				@Test
 				void shouldThrow401() throws Exception {
-					val updated = Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
+					val get = Bridge.account_product(mvc, orangeInCart);
+					val updated = Bridge.update(mvc, get, AccountProductInfo.builder()
 							.quantity(97)
 							.build());
 					assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -370,11 +392,11 @@ public class BaeminLogicTests {
 				
 				@Test
 				void shouldKeepQuantity() throws Exception {
-					val orange2 = Bridge.product(mvc, orange.getId());
+					val orange2 = Bridge.product(mvc, orange);
 					assertThat(orange2.getStatusCode()).isEqualTo(HttpStatus.OK);
 					assertThat(orange2.getBody().getQuantity()).isEqualTo(100);
 					
-					val banana2 = Bridge.product(mvc, banana.getId());
+					val banana2 = Bridge.product(mvc, banana);
 					assertThat(banana2.getStatusCode()).isEqualTo(HttpStatus.OK);
 					assertThat(banana2.getBody().getQuantity()).isEqualTo(10);
 				}
@@ -390,11 +412,11 @@ public class BaeminLogicTests {
 					
 					@Test
 					void shouldConsumeProductQuantity() throws Exception {
-						val orange2 = Bridge.product(mvc, orange.getId());
+						val orange2 = Bridge.product(mvc, orange);
 						assertThat(orange2.getStatusCode()).isEqualTo(HttpStatus.OK);
 						assertThat(orange2.getBody().getQuantity()).isEqualTo(90);
 
-						val banana2 = Bridge.product(mvc, banana.getId());
+						val banana2 = Bridge.product(mvc, banana);
 						assertThat(banana2.getStatusCode()).isEqualTo(HttpStatus.OK);
 						assertThat(banana2.getBody().getQuantity()).isEqualTo(0);
 					}
@@ -402,7 +424,8 @@ public class BaeminLogicTests {
 					@Test
 					@WithBuyer
 					void cancel() throws Exception {
-						val order1 = Bridge.cancel(mvc, order);
+						val get = Bridge.order(mvc, order);
+						val order1 = Bridge.cancel(mvc, get);
 						assertThat(order1.getStatusCode()).isEqualTo(HttpStatus.OK);
 						assertThat(order1.getBody().getStatus()).isEqualTo(Status.CANCELLED);
 					}
@@ -417,10 +440,8 @@ public class BaeminLogicTests {
 					@Test
 					@WithBuyer
 					void whenPlusQuantity_thenShouldReturn400() throws Exception {
-						val updated = Bridge.update(mvc, orangeInCart, AccountProductInfo.builder()
-								.quantity(97)
-								.build());
-						assertThat(updated.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+						val get = Bridge.account_product(mvc, orangeInCart);
+						assertThat(get.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
 					}
 					
 					@Nested
@@ -435,20 +456,21 @@ public class BaeminLogicTests {
 						@Test
 						@WithBuyer
 						void shouldNotBeModified() throws Exception {
-							val cancel = Bridge.cancel(mvc, cancelled);
+							val get = Bridge.order(mvc, cancelled);
+							val cancel = Bridge.cancel(mvc, get);
 							assertThat(cancel.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 							
-							val complete = Bridge.complete(mvc, cancelled);
+							val complete = Bridge.complete(mvc, get);
 							assertThat(complete.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 						}
 						
 						@Test
 						void productStatusShouldBeRestored() throws Exception {
-							val orange2 = Bridge.product(mvc, orange.getId());
+							val orange2 = Bridge.product(mvc, orange);
 							assertThat(orange2.getStatusCode()).isEqualTo(HttpStatus.OK);
 							assertThat(orange2.getBody().getQuantity()).isEqualTo(100);
 
-							val banana2 = Bridge.product(mvc, banana.getId());
+							val banana2 = Bridge.product(mvc, banana);
 							assertThat(banana2.getStatusCode()).isEqualTo(HttpStatus.OK);
 							assertThat(banana2.getBody().getQuantity()).isEqualTo(10);
 						}
@@ -464,7 +486,8 @@ public class BaeminLogicTests {
 					
 					@Test
 					void complete() throws Exception {
-						val order1 = Bridge.complete(mvc, order);
+						val get = Bridge.order(mvc, order);
+						val order1 = Bridge.complete(mvc, get);
 						assertThat(order1.getStatusCode()).isEqualTo(HttpStatus.OK);
 						assertThat(order1.getBody().getStatus()).isEqualTo(Status.COMPLETED);
 					}
@@ -481,20 +504,21 @@ public class BaeminLogicTests {
 						@Test
 						@WithBuyer
 						void shouldNotBeModified() throws Exception {
-							val cancel = Bridge.cancel(mvc, completed);
+							val get = Bridge.order(mvc, completed);
+							val cancel = Bridge.cancel(mvc, get);
 							assertThat(cancel.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 							
-							val complete = Bridge.complete(mvc, completed);
+							val complete = Bridge.complete(mvc, get);
 							assertThat(complete.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 						}
 						
 						@Test
 						void productStatusShouldBeRetained() throws Exception {
-							val orange2 = Bridge.product(mvc, orange.getId());
+							val orange2 = Bridge.product(mvc, orange);
 							assertThat(orange2.getStatusCode()).isEqualTo(HttpStatus.OK);
 							assertThat(orange2.getBody().getQuantity()).isEqualTo(90);
 
-							val banana2 = Bridge.product(mvc, banana.getId());
+							val banana2 = Bridge.product(mvc, banana);
 							assertThat(banana2.getStatusCode()).isEqualTo(HttpStatus.OK);
 							assertThat(banana2.getBody().getQuantity()).isEqualTo(0);
 						}

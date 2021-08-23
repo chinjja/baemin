@@ -17,6 +17,7 @@ import com.chinjja.app.account.Account;
 import com.chinjja.app.account.AccountRole;
 import com.chinjja.app.account.Address;
 import com.chinjja.app.account.dto.AccountCreateDto;
+import com.chinjja.app.account.dto.AccountInfo;
 import com.chinjja.app.account.dto.AddressInfo;
 import com.chinjja.app.account.repo.AccountRepository;
 import com.chinjja.app.account.repo.AccountRoleRepository;
@@ -65,6 +66,13 @@ public class AccountService {
 		account.setPassword(passwordEncoder.encode(dto.getPassword()));
 		addRole(account, "USER");
 		return account;
+	}
+	
+	@Transactional
+	public Account update(Account account, @Valid AccountInfo dto) {
+		if(account.getId() == null) throw new IllegalArgumentException("id must be not null");
+		mapper.map(dto, account);
+		return accountRepository.save(account);
 	}
 	
 	@Transactional

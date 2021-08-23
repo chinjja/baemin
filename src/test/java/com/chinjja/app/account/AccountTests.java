@@ -41,7 +41,7 @@ public class AccountTests {
 	}
 	@Test
 	void whenAfterInitialize_thenShouldExistAdminUser() throws Exception {
-		val account = Bridge.account(mvc, 1);
+		val account = Bridge.account(mvc, this.account);
 		
 		assertThat(account.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(account.getBody().getId()).isEqualTo(1);
@@ -123,7 +123,7 @@ public class AccountTests {
 		assertThat(addresses.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(addresses.getBody()).hasSize(1).contains(address.getBody());
 		
-		val updated = Bridge.update_address(mvc, address.getBody(), AddressInfo.builder()
+		val updated = Bridge.update_address(mvc, address, AddressInfo.builder()
 				.city("hello")
 				.build());
 		assertEquals(account.withPassword(null), updated.getBody().getAccount());
@@ -196,7 +196,8 @@ public class AccountTests {
 			@Test
 			@WithMockUser("root@user.com")
 			void masterAddress2() throws Exception {
-				val updated = Bridge.update_address(mvc, addr2, AddressInfo.builder()
+				val get = Bridge.address(mvc, addr2);
+				val updated = Bridge.update_address(mvc, get, AddressInfo.builder()
 						.master(true)
 						.build());
 				val master = Bridge.master_address(mvc, account);

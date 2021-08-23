@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
 import com.chinjja.app.account.Account;
+import com.chinjja.app.etag.Etag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ import lombok.With;
 @Builder
 @With
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "product_id"}))
-public class AccountProduct {
+public class AccountProduct implements Etag {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

@@ -11,6 +11,7 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.chinjja.app.etag.Etag;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ import lombok.With;
 @Builder
 @With
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "role"}))
-public class AccountRole {
+public class AccountRole implements Etag {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
